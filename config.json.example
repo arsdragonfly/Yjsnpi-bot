@@ -1,3 +1,4 @@
 {
-  "token": "Replace this with a valid bot token."
+  "token": "Replace this with a valid bot token.",
+  "prefix": "()"
 }

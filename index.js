@@ -9,20 +9,27 @@ const Discord = require('discord.js');
 const client = new Discord.Client();
 
 const config = require('./config.json');
+
+const commands = require('./commands.js');
+
 /**
  * The ready event is vital, it means that only _after_ this will your bot start reacting to information
  * received from Discord
  */
+
 client.on('ready', () => {
   console.log('I am ready!');
 });
 
 // Create an event listener for messages
-client.on('message', message => {
-  // If the message is "ping"
-  if (message.content === 'ping') {
-    // Send "pong" to the same channel
-    message.channel.send('pong');
+client.on('message', msg => {
+  if (msg.content === '114') {
+    msg.channel.send('514');
+  }
+  if (!msg.content.startsWith(config.prefix)) return;
+  let option = msg.content.toLowerCase().slice(config.prefix.length).split(' ')[0];
+  if (commands.hasOwnProperty(option)) {
+      commands[option](msg);
   }
 });
 
