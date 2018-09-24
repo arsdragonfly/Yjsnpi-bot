@@ -21,7 +21,7 @@ const tmp = require("tmp-promise");
 
 const spawn = require('child-process-promise').spawn;
 
-//DownloadBibleTitle:: Future e String
+//DownloadBibleTitle :: Future e String
 let downloadBibleTitle = Future.tryP(() =>
     request.get("https://api.imjad.cn/bilibili/v2/").query({
       //“Whoever believes and is baptized will be saved; whoever does not believe will be condemned.”
@@ -33,13 +33,15 @@ let downloadBibleTitle = Future.tryP(() =>
     }).then(S.gets(S.is($.String))(["body", "data", "title"])))
   .chain(S.maybe(Future.reject("Failed to parse json from Bilibili API"))(Future.resolve));
 
-//path:: Future e String
-let downloadBible = Future.tryP(() => tmp.tmpName({
+//generatePath :: Future e String
+let generatePath = Future.tryP(() => tmp.tmpName({
       template: "tmp-XXXXXX"
     })
     .then(S.toMaybe))
-  .chain(S.maybe(Future.reject("Failed to generate temp path name"))(Future.resolve))
-  .chain(Future.encaseP(path => {
+  .chain(S.maybe(Future.reject("Failed to generate temp path name"))(Future.resolve));
+
+//downloadBibleAtPath :: String -> Future e String
+let downloadBibleAtPath =Future.encaseP(path => {
     let pathPromise = spawn("annie",
       ["-o", "/tmp/", "-O", path, "av32153770"], {
         shell: true,
@@ -54,9 +56,10 @@ let downloadBible = Future.tryP(() => tmp.tmpName({
     });
 
     return pathPromise;
-  }));
+  });
 
 module.exports = {
   downloadBibleTitle,
-  downloadBible
+  generatePath,
+  downloadBibleAtPath
 };

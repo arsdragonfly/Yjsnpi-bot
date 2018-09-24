@@ -1,20 +1,36 @@
+const Future = require("fluture");
 const {
   create,
   env
 } = require("sanctuary");
+const {
+  env: flutureEnv
+} = require('fluture-sanctuary-types');
 const $ = require("sanctuary-def");
 const type = require("sanctuary-type-identifiers");
 const S = create({
   checkTypes: process.env.NODE_ENV !== "production",
-  env: env,
+  env: env.concat(flutureEnv),
 });
 
 const glob = require("glob-promise");
 
 const config = require('./config.json');
-const {downloadBible} = require('./bible.js');
+const {
+  downloadBibleTitle,
+  generatePath,
+  downloadBibleAtPath
+} = require('./bible.js');
 
 let queue = {};
+
+const checkQueue = (msg) => {
+  if (!queue.hasOwnProperty(msg.guild.id)) {
+    queue[msg.guild.id] = {};
+    queue[msg.guild.id].playing = false;
+    queue[msg.guild.id].songs = [];
+  }
+};
 
 // functions of commands
 const help = (msg) => {
@@ -39,6 +55,7 @@ const help = (msg) => {
 };
 
 const queueCmd = (msg) => {
+  //TODO: Also display the currently playing music
   if (queue[msg.guild.id] === undefined) return msg.channel.send(`Add some songs to the queue first with ${config.prefix}add`);
   let tosend = [];
   queue[msg.guild.id].songs.forEach((song, i) => {
@@ -63,19 +80,36 @@ const add = (msg) => {
     msg.channel.send(`added **${info.title}** to the queue`);
   });
   */
+
   //TODO: allow choosing which song to play
-  if (!queue.hasOwnProperty(msg.guild.id)) {
-    queue[msg.guild.id] = {};
-    queue[msg.guild.id].playing = false;
-    queue[msg.guild.id].songs = [];
-  }
+
+  checkQueue(msg);
+
+  //avoid dynamic this causing troubles
   let pushToQueue = queue[msg.guild.id].songs.push.bind(queue[msg.guild.id].songs);
-  let handleError = () => {
-    msg.channel.send("Cannot connect to Bilibili");
-    return S.Nothing;
+  let sendMessage = msg.channel.send.bind(msg.channel);
+  let sendErrorMessage = (m) => sendMessage("Error: " + m);
+
+  let processTitleAndPath = ([title, path]) => {
+    //TODO: implement some kind of progress bar
+    let item = {};
+    item.title = title;
+    item.path = path;
+    item.status = "pending";
+    item.toFailed = () => {
+      console.log(" " + title + " at " + path + " " + "failed");
+      item.status = "failed";
+    };
+    item.toSuccess = () => {
+      console.log(" " + title + " at " + path + " " + "success");
+      item.status = "success";
+    };
+    pushToQueue(item);
+    downloadBibleAtPath(path).fork(item.toFailed, item.toSuccess);
   }
-  downloadBible().then(S.maybe_(handleError)(pushToQueue))
-  msg.channel.send("added the Old Testament to the queue.");
+
+  Future.both(downloadBibleTitle, generatePath).fork(sendErrorMessage, processTitleAndPath);
+
 };
 
 const join = (msg) => {
@@ -86,85 +120,86 @@ const join = (msg) => {
   });
 };
 
+//helper function for play
+const playItem = (msg) => (item) => {
+  console.log(item);
+  if (item === undefined) return msg.channel.send('Queue is empty').then(() => {
+    queue[msg.guild.id].playing = false;
+    msg.member.voiceChannel.leave();
+  });
+  if (item.status === "pending") {
+    setTimeout(() => playItem(msg)(item), 500);
+  } else if (item.status === "failed") {
+    playItem(msg)(queue[msg.guild.id].songs.shift());
+  } else {
+    //TODO: fix hardcoded path here
+    let handleError = (err) => {
+      console.error("Error: failed to read file.\n" + err);
+      playItem(msg)(queue[msg.guild.id].songs.shift());
+    }
+    Future.encaseP(path => glob("/tmp/" + path + ".*").then(arr => arr[0]))(item.path)
+      .fork(handleError, playPath(msg));
+  }
+};
+
+//helper function for play
+const playPath = (msg) => (path) => {
+  console.log("Now playing " + path);
+  let dispatcher = msg.guild.voiceConnection.playFile(path);
+  let collector = msg.channel.createCollector(m => m);
+  collector.on('message', m => {
+    if (m.content.startsWith(config.prefix + 'pause')) {
+      msg.channel.send('paused').then(() => {
+        dispatcher.pause();
+      });
+    } else if (m.content.startsWith(config.prefix + 'resume')) {
+      msg.channel.send('resumed').then(() => {
+        dispatcher.resume();
+      });
+    } else if (m.content.startsWith(config.prefix + 'skip')) {
+      msg.channel.send('skipped').then(() => {
+        dispatcher.end();
+      });
+    } else if (m.content.startsWith('volume+')) {
+      if (Math.round(dispatcher.volume * 50) >= 100) return msg.channel.send(`Volume: ${Math.round(dispatcher.volume*50)}%`);
+      dispatcher.setVolume(Math.min((dispatcher.volume * 50 + (2 * (m.content.split('+').length - 1))) / 50, 2));
+      msg.channel.send(`Volume: ${Math.round(dispatcher.volume*50)}%`);
+    } else if (m.content.startsWith('volume-')) {
+      if (Math.round(dispatcher.volume * 50) <= 0) return msg.channel.send(`Volume: ${Math.round(dispatcher.volume*50)}%`);
+      dispatcher.setVolume(Math.max((dispatcher.volume * 50 - (2 * (m.content.split('-').length - 1))) / 50, 0));
+      msg.channel.send(`Volume: ${Math.round(dispatcher.volume*50)}%`);
+    } else if (m.content.startsWith(config.prefix + 'time')) {
+      msg.channel.send(`time: ${Math.floor(dispatcher.time / 60000)}:${Math.floor((dispatcher.time % 60000)/1000) <10 ? '0'+Math.floor((dispatcher.time % 60000)/1000) : Math.floor((dispatcher.time % 60000)/1000)}`);
+    }
+  });
+  dispatcher.on('end', () => {
+    collector.stop();
+    playItem(msg)(queue[msg.guild.id].songs.shift());
+  });
+  dispatcher.on('error', (err) => {
+    return msg.channel.send('error: ' + err).then(() => {
+      collector.stop();
+      playItem(msg)(queue[msg.guild.id].songs.shift());
+    });
+  });
+};
+
+
 const play = (msg) => {
   if (queue[msg.guild.id] === undefined) return msg.channel.send(`Add some songs to the queue first with ${config.prefix}add`);
   if (!msg.guild.voiceConnection) return join(msg).then(() => play(msg));
   if (queue[msg.guild.id].playing) return msg.channel.send('Already Playing');
-  let dispatcher;
+
+  checkQueue(msg);
 
   //TODO: fix this flag
   queue[msg.guild.id].playing = true;
 
-  const playSong = (async (song) => {
-    if (song === undefined) return msg.channel.send('Queue is empty').then(() => {
-      queue[msg.guild.id].playing = false;
-      msg.member.voiceChannel.leave();
-    });
-    //TODO: allow choosing which song to play
-    /*
-    msg.channel.send(`Playing: **${song.title}** as requested by: **${song.requester}**`);
-    */
-    //dispatcher = msg.guild.voiceConnection.playStream(yt(song.url, {
-    //  audioonly: true
-    //}), {
-    //  passes: config.passes
-    //});
+  //TODO: allow choosing which song to play
 
-    //TODO: make this less potentially buggy
-    let path = await song.path;
-    //TODO: refactor the whole func into async to avoid this ugly shit
-    if (S.isJust(path)) {
-      try {
-        path = await glob(S.fromMaybe("")(path));
-        path = path[0];
-        path = S.Just(path);
-      } catch (e) {
-        console.log(e);
-        path = S.Nothing;
-      }
-    }
-    S.maybe_(() => {msg.channel.send("Download failed."); return S.Nothing;})((path) => {
-      dispatcher = msg.guild.voiceConnection.playFile(path);
-      let collector = msg.channel.createCollector(m => m);
-      collector.on('message', m => {
-        if (m.content.startsWith(config.prefix + 'pause')) {
-          msg.channel.send('paused').then(() => {
-            dispatcher.pause();
-          });
-        } else if (m.content.startsWith(config.prefix + 'resume')) {
-          msg.channel.send('resumed').then(() => {
-            dispatcher.resume();
-          });
-        } else if (m.content.startsWith(config.prefix + 'skip')) {
-          msg.channel.send('skipped').then(() => {
-            dispatcher.end();
-          });
-        } else if (m.content.startsWith('volume+')) {
-          if (Math.round(dispatcher.volume * 50) >= 100) return msg.channel.send(`Volume: ${Math.round(dispatcher.volume*50)}%`);
-          dispatcher.setVolume(Math.min((dispatcher.volume * 50 + (2 * (m.content.split('+').length - 1))) / 50, 2));
-          msg.channel.send(`Volume: ${Math.round(dispatcher.volume*50)}%`);
-        } else if (m.content.startsWith('volume-')) {
-          if (Math.round(dispatcher.volume * 50) <= 0) return msg.channel.send(`Volume: ${Math.round(dispatcher.volume*50)}%`);
-          dispatcher.setVolume(Math.max((dispatcher.volume * 50 - (2 * (m.content.split('-').length - 1))) / 50, 0));
-          msg.channel.send(`Volume: ${Math.round(dispatcher.volume*50)}%`);
-        } else if (m.content.startsWith(config.prefix + 'time')) {
-          msg.channel.send(`time: ${Math.floor(dispatcher.time / 60000)}:${Math.floor((dispatcher.time % 60000)/1000) <10 ? '0'+Math.floor((dispatcher.time % 60000)/1000) : Math.floor((dispatcher.time % 60000)/1000)}`);
-        }
-      });
-      dispatcher.on('end', () => {
-        collector.stop();
-        playSong(queue[msg.guild.id].songs.shift());
-      });
-      dispatcher.on('error', (err) => {
-        return msg.channel.send('error: ' + err).then(() => {
-          collector.stop();
-          playSong(queue[msg.guild.id].songs.shift());
-        });
-      });
-    })(path);
-  });
-  playSong(queue[msg.guild.id].songs.shift());
+  playItem(msg)(queue[msg.guild.id].songs.shift());
 };
+
 
 //const reboot = (msg) => {
 //  if (msg.author.id == config.adminID) process.exit(); //Requires a node module like Forever to work.
