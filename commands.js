@@ -27,7 +27,7 @@ const {
 const queue = {};
 
 const checkQueue = (msg) => {
-  if (!queue.msg.guild.id) {
+  if (!(msg.guild.id in queue)) {
     queue[msg.guild.id] = {};
     queue[msg.guild.id].playing = false;
     queue[msg.guild.id].songs = [];

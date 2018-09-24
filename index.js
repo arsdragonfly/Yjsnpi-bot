@@ -29,7 +29,7 @@ client.on('message', (msg) => {
   }
   if (!msg.content.startsWith(config.prefix)) return;
   const option = msg.content.toLowerCase().slice(config.prefix.length).split(' ')[0];
-  if (commands.option) {
+  if (option in commands) {
     commands[option](msg);
   }
 });
