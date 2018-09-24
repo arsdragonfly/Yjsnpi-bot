@@ -13,7 +13,8 @@ const config = require('./config.json');
 const commands = require('./commands.js');
 
 /**
- * The ready event is vital, it means that only _after_ this will your bot start reacting to information
+ * The ready event is vital, it means that only _after_ this
+ * will your bot start reacting to information
  * received from Discord
  */
 
@@ -22,14 +23,14 @@ client.on('ready', () => {
 });
 
 // Create an event listener for messages
-client.on('message', msg => {
+client.on('message', (msg) => {
   if (msg.content === '114') {
     msg.channel.send('514');
   }
   if (!msg.content.startsWith(config.prefix)) return;
-  let option = msg.content.toLowerCase().slice(config.prefix.length).split(' ')[0];
-  if (commands.hasOwnProperty(option)) {
-      commands[option](msg);
+  const option = msg.content.toLowerCase().slice(config.prefix.length).split(' ')[0];
+  if (commands.option) {
+    commands[option](msg);
   }
 });
 

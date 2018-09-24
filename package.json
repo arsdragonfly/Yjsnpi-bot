@@ -33,8 +33,14 @@
     "libsodium-wrappers": "^0.7.3",
     "node-opus": "^0.3.0",
     "sanctuary": "^0.15.0",
+    "sanctuary-def": "^0.18.1",
     "sum-type": "^0.12.0",
     "superagent": "^3.8.3",
     "tmp-promise": "^1.0.5"
+  },
+  "devDependencies": {
+    "eslint": "^5.6.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0"
   }
 }
