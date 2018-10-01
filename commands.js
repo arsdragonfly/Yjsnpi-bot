@@ -37,20 +37,21 @@ const checkQueue = (msg) => {
 // functions of commands
 const help = (msg) => {
   const tosend = [
-    '```xl',
-    `${config.prefix}join : "Join Voice channel of msg sender"`,
-    `${config.prefix}add : "Add a valid youtube link to the queue"`,
-    `${config.prefix}queue : "Shows the current queue, up to 15 songs shown."`,
-    `${config.prefix}play : "Play the music queue if already joined to a voice channel"`,
-    '',
-    'the following commands only function while the play command is running:'.toUpperCase(),
-    `${config.prefix}pause : "pauses the music"`,
-    `${config.prefix}resume : "resumes the music"`,
-    `${config.prefix}skip : "skips the playing song"`,
-    // Todo: fix this red text
-    `${config.prefix}time : "Shows the playtime of the song."`,
-    'volume+(+++) : "increases volume by 2%/+"',
-    'volume-(---) : "decreases volume by 2%/-"',
+    '```asciidoc',
+    `YJSNPI Bot Commands
+-------------------
+= General =
+${config.prefix}join :: Join voice channel of message sender
+${config.prefix}add :: Add a valid Bilibili video to the queue
+${config.prefix}queue :: Show the current queue, up to 15 songs shown
+${config.prefix}play :: Play music in the queue for the channel
+= Music Control =
+${config.prefix}pause :: Pause the music
+${config.prefix}resume :: Resume the music
+${config.prefix}skip :: Skip the playing song
+${config.prefix}time :: Show the playtime of the song
+volume+(+++) :: Increase volume by 2%/+
+volume-(---) :: Decrease volume by 2%/-`,
     '```',
   ];
   msg.channel.send(tosend.join('\n'));
