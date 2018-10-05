@@ -24,22 +24,7 @@ const {
   downloadBibleAtPath,
 } = require('./bible');
 
-function song(spec) {
-  // Constructor for songs
-  // spec must include title and path
-  const song = {};
-  const { title, path } = spec;
-  let status = 'pending';
-  song.toFail = () => {
-    status = 'fail';
-  };
-  song.toSuccess = () => {
-    status = 'success';
-  };
-  song.title = () => title;
-  song.path = () => path;
-  return song;
-}
+const { song } = require('../lib/song');
 
 const queue = {};
 
@@ -122,9 +107,9 @@ const playItem = msg => (item) => {
       msg.member.voiceChannel.leave();
     });
   }
-  if (item.status === 'pending') {
+  if (item.status() === 'pending') {
     setTimeout(() => playItem(msg)(item), 500);
-  } else if (item.status === 'fail') {
+  } else if (item.status() === 'fail') {
     playItem(msg)(queue[msg.guild.id].songs.shift());
   } else {
     // TODO: fix hardcoded path here

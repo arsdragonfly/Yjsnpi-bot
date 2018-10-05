@@ -76,3 +76,6 @@ typings/
 
 # Bot token config, etc.
 config.json
+
+# compiled js
+lib/*.js

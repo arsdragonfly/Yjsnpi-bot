@@ -15,6 +15,12 @@ Then, install Annie from here for Bilibili access:
 Next, clone the directory and run
 
 ```bash
+npm install -g typescript
+```
+
+After installing typescript, run
+
+```bash
 $ npm install && npm run start
 ```
 
