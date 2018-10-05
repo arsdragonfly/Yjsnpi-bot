@@ -8,7 +8,7 @@ const Discord = require('discord.js');
 // Create an instance of a Discord client
 const client = new Discord.Client();
 
-const config = require('./config.json');
+const config = require('../config.json');
 
 const commands = require('./commands.js');
 

@@ -7,7 +7,7 @@ const {
 const {
   env: flutureEnv,
 } = require('fluture-sanctuary-types');
-// const $ = require('sanctuary-def');
+// const $ = require('sanctuary-def')
 // const type = require('sanctuary-type-identifiers');
 
 const S = create({
@@ -17,12 +17,12 @@ const S = create({
 
 const glob = require('glob-promise');
 
-const config = require('./config.json');
+const config = require('../config.json');
 const {
   downloadBibleTitle,
   generatePath,
   downloadBibleAtPath,
-} = require('./bible.js');
+} = require('./bible');
 
 const queue = {};
 

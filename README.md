@@ -9,13 +9,13 @@ This project is currently a WIP.
 Copy `config.json.example` to `config.json` and fill in a token obtained here:
 <https://discordapp.com/developers/applications/me>
 
+Then, install Annie from here for Bilibili access:
+<https://github.com/iawia002/annie>
+
 Next, clone the directory and run
 
 ```bash
-$ npm install && node index.js
+$ npm install && npm run start
 ```
-
-Then, install Annie from here for Bilibili access:
-<https://github.com/iawia002/annie>
 
 and you're ready to go.
