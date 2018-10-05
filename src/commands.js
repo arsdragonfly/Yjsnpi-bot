@@ -24,6 +24,23 @@ const {
   downloadBibleAtPath,
 } = require('./bible');
 
+function song(spec) {
+  // Constructor for songs
+  // spec must include title and path
+  const song = {};
+  const { title, path } = spec;
+  let status = 'pending';
+  song.toFail = () => {
+    status = 'fail';
+  };
+  song.toSuccess = () => {
+    status = 'success';
+  };
+  song.title = () => title;
+  song.path = () => path;
+  return song;
+}
+
 const queue = {};
 
 const checkQueue = (msg) => {
@@ -62,7 +79,7 @@ const queueCmd = (msg) => {
   if (queue[msg.guild.id] === undefined) return msg.channel.send(`Add some songs to the queue first with ${config.prefix}add`);
   const tosend = [];
   queue[msg.guild.id].songs.forEach((song, i) => {
-    tosend.push(`${i + 1}. ${song.title}`);
+    tosend.push(`${i + 1}. ${song.title()}`);
   });
   msg.channel.send(`__**${msg.guild.name}'s Music Queue:**__ Currently **${tosend.length}** songs queued ${(tosend.length > 15 ? '*[Only next 15 shown]*' : '')}\n\`\`\`${tosend.slice(0, 15).join('\n')}\`\`\``);
   return S.Nothing;
@@ -81,20 +98,9 @@ const add = (msg) => {
 
   const processTitleAndPath = ([title, path]) => {
     // TODO: implement some kind of progress bar
-    const item = {};
-    item.title = title;
-    item.path = path;
-    item.status = 'pending';
-    item.toFailed = () => {
-      console.log(` ${title} at ${path} failed`);
-      item.status = 'failed';
-    };
-    item.toSuccess = () => {
-      console.log(` ${title} at ${path} success`);
-      item.status = 'success';
-    };
+    const item = song({ title, path });
     pushToQueue(item);
-    downloadBibleAtPath(path).fork(item.toFailed, item.toSuccess);
+    downloadBibleAtPath(path).fork(item.toFail, item.toSuccess);
   };
 
   Future.both(downloadBibleTitle, generatePath).fork(sendErrorMessage, processTitleAndPath);
@@ -118,7 +124,7 @@ const playItem = msg => (item) => {
   }
   if (item.status === 'pending') {
     setTimeout(() => playItem(msg)(item), 500);
-  } else if (item.status === 'failed') {
+  } else if (item.status === 'fail') {
     playItem(msg)(queue[msg.guild.id].songs.shift());
   } else {
     // TODO: fix hardcoded path here
@@ -126,7 +132,7 @@ const playItem = msg => (item) => {
       console.error(`Error: failed to read file.\n${err}`);
       playItem(msg)(queue[msg.guild.id].songs.shift());
     };
-    Future.encaseP(path => glob(`/tmp/${path}.*`).then(arr => arr[0]))(item.path)
+    Future.encaseP(path => glob(`/tmp/${path}.*`).then(arr => arr[0]))(item.path())
       .fork(handleError, playPath(msg));
   }
   return S.Nothing;
