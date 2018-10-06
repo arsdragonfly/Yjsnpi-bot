@@ -1,6 +1,6 @@
 import { Client } from 'discord.js';
 import config from '../config';
-import commands from './commands'
+import { dispatch } from './commands'
 
 const client = new Client();
 
@@ -9,12 +9,7 @@ client.on('ready', () => {
 });
 
 client.on('message', (msg) => {
-    if (msg.content.startsWith(config.prefix)) {
-        const option: string =  msg.content.toLowerCase().slice(config.prefix.length).split(' ')[0];
-        if (option in commands) {
-            commands[option](msg);
-        }
-    }
+    dispatch(msg);
 });
 
 client.login(config.token);

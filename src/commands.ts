@@ -1,31 +1,41 @@
 import config from '../config';
+import { Message } from 'discord.js';
 
-interface Commands {
-    readonly help: (msg) => void;
-    readonly '114': (msg) => void;
-}
+type CommandsString = 'help' | '114';
 
-let help = (msg) => {
+type Commands = {[k in CommandsString]: (msg: Message) => void}
+
+const help = (msg: Message) => {
     const tosend: string[] = [
         '```asciidoc',
         `YJSNPI Bot Commands
 -------------------
 = General =
 ${config.prefix}add :: Add a valid Bilibili video to the queue
-${config.prefix}queue :: Show the current queue, up to 15 songs shown
-${config.prefix}play :: Play music in the queue for the channel
+${config.prefix}queue :: Show the current queue
+${config.prefix}play :: Play queued music
 = Music Control =
 ${config.prefix}pause :: Pause the music
 ${config.prefix}resume :: Resume the music
-${config.prefix}skip :: Skip the playing song`,
+${config.prefix}skip :: Skip to the next song`,
         '```',
     ];
     msg.channel.send(tosend.join('\n'));
 };
 
-let commands: Commands = {
+const commands: Commands = {
     help: help,
-    "114": (msg) => { msg.channel.send('514') }
+    '114': (msg) => { msg.channel.send('514') }
 };
 
-export default commands;
+export const dispatch: (msg: Message) => void = (msg) => {
+    const option = msg.content.toLowerCase().slice(config.prefix.length).split(' ').shift();
+    if (typeof option === "string") {
+        if (option === 'help') {
+            commands.help(msg);
+        }
+        if (option === '114') {
+            commands["114"](msg);
+        }
+    }
+};
