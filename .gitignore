@@ -78,4 +78,4 @@ typings/
 config.json
 
 # compiled js
-lib/*.js
+**/*.js

@@ -1,9 +1,9 @@
-export interface SongSpec {
+interface SongSpec {
     readonly title: string;
     readonly path: string;
 }
 
-export type SongStatus = "pending" | "fail" | "success";
+type SongStatus = "pending" | "fail" | "success";
 
 export interface Song {
     readonly title: () => string;
