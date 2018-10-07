@@ -2,7 +2,7 @@
 
 The stinkiest Discord bot ever. (realistically)
 
-This project is currently a WIP.
+Check out the [Contribution Guidelines](./CONTRIBUTING.md) if you want you make Yjsnpi-bot become better!
 
 ## How to set up
 
