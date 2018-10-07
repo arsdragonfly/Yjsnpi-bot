@@ -1,33 +1,59 @@
-interface SongSpec {
+export interface SongSpec {
     readonly title: string
+    readonly pendingPath: string
+    readonly aid: number
+}
+
+export interface Pending {
+    readonly tag: 'pending'
+    readonly title: string
+    readonly pendingPath: string
+    readonly aid: number
+}
+
+export interface Fail {
+    readonly tag: 'fail'
+    readonly title: string
+}
+
+export interface Success {
+    readonly tag: 'success'
+    readonly title: string
+    //full path of the download file
     readonly path: string
     readonly aid: number
 }
 
-type SongStatus = "pending" | "fail" | "success"
+export type SongStatus = Pending | Fail | Success
 
 export interface Song {
-    readonly title: string
-    readonly path: string
-    readonly aid: number
-    readonly toFail: () => void
-    readonly toSuccess: () => void
     readonly status: () => SongStatus
+    readonly toFail: () => SongStatus
+    readonly toSuccess: (fullPath: string) => SongStatus
 }
 
 export function song(spec: SongSpec): Song {
-    let {title, path, aid} = spec
-    let status: SongStatus = "pending"
+    let { title, pendingPath, aid } = spec
+    let status: SongStatus = { tag: 'pending', title, pendingPath, aid }
     return {
-        title: title,
-        path: path,
-        aid: aid,
+        status: () => status,
         toFail: () => {
-            status = "fail"
+            switch (status.tag) {
+                case 'pending':
+                    status = { tag: 'fail', title: `(Download Failed! (≧Д≦)) ${title}` }
+                    return status;
+                default:
+                    return status;
+            }
         },
-        toSuccess: () => {
-            status = "success"
-        },
-        status: () => status
+        toSuccess: (fullPath: string) => {
+            switch (status.tag) {
+                case 'pending':
+                    status = { tag: 'success', title, path: fullPath, aid }
+                    return status;
+                default:
+                    return status;
+            }
+        }
     }
 }

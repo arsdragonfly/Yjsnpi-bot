@@ -1,9 +1,10 @@
 import * as request from 'superagent'
 import { tmpName } from 'tmp-promise'
 import * as Future from 'fluture'
-import { spawnPromise } from 'spawn-rx'
+import { spawn } from 'promisify-child-process'
 import * as fp from 'lodash/fp'
-import { song, Song } from '../lib/song'
+import * as song from '../lib/song'
+import * as glob from 'glob-promise'
 
 const downloadTitle = (aid: number) =>
     Future.tryP(() =>
@@ -28,10 +29,21 @@ const generatePath = Future.tryP(() =>
 export const createSong = (aid: number) =>
     Future
         .both(downloadTitle(aid), generatePath)
-        .map(([title, path]) => song({ title, path, aid }))
+        .map(([title, pendingPath]) => song.song({ title, pendingPath, aid }))
 
-export const downloadSong = (song: Song) =>
-    Future.tryP(() =>
-        spawnPromise('annie', ['-o', '/tmp/', '-O', song.path, 'av' + song.aid], { shell: true })
-            .then(() => `/tmp/${song.path}.*`))
+export const downloadSong = (song: song.Song) =>
+    Future.tryP(() => {
+        let status = song.status()
+        switch (status.tag) {
+            case 'pending':
+                let pendingPath = status.pendingPath
+                return spawn('annie', ['-o', '/tmp/', '-O', pendingPath, 'av' + status.aid], { shell: true })
+                    .then(() => glob(`/tmp/${pendingPath}.*`))
+                    .then((arr: string[]) => ((str: string | undefined) =>
+                        str ? Promise.resolve(str) : Promise.reject('File not found.'))
+                        (arr.shift()))
+            default:
+                return Promise.reject('Internal error.')
+        }
+    })
 
