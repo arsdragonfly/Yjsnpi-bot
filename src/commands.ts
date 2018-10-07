@@ -81,7 +81,7 @@ const play = (msg: Message) => {
                         setTimeout(() => processQueueStatus(status), 500)
                         break
                     case 'success':
-                        if (songStatus.tag == 'success') {
+                        if (songStatus.tag === 'success') {
                             // This if statement looks totally stupid
                             // and it's the evidence of how broken Typescript's union type,
                             // or so-called "code flow analysis" is.

@@ -63,7 +63,7 @@ function queue(): Queue {
                     return status
                 default: 
                     let song = status.queue.shift()
-                    if (song) {
+                    if (song !== undefined) {
                         status = { tag: 'playing', song, queue: status.queue }
                         return status
                     } else {
