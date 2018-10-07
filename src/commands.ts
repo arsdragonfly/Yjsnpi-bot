@@ -23,6 +23,8 @@ ${config.prefix}skip :: Skip to the next song`,
     msg.channel.send(tosend.join('\n'));
 };
 
+// building commands & dispatcher
+
 const commands: Commands = {
     help: help,
     '114': (msg) => { msg.channel.send('514') }
