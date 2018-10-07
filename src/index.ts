@@ -1,11 +1,13 @@
 import { Client } from 'discord.js';
 import config from '../config';
 import { dispatch } from './commands'
+const ffmpeg = require('ffmpeg-binaries')
 
 const client = new Client();
 
 client.on('ready', () => {
-    console.log('I am ready!');
+    console.log('I am ready!')
+    console.log(ffmpeg)
     client.user.setPresence({
         game: {
             name: `Ikisugi! | ${config.prefix}help`
