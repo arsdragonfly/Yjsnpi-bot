@@ -6,10 +6,17 @@ const client = new Client();
 
 client.on('ready', () => {
     console.log('I am ready!');
+    client.user.setPresence({
+        game: {
+            name: `Ikisugi! | ${config.prefix}help`
+        }
+    })
 });
 
 client.on('message', (msg) => {
-    dispatch(msg);
+    if (msg.content.startsWith(config.prefix)) {
+        dispatch(msg);
+    }
 });
 
 client.login(config.token);

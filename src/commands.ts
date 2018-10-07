@@ -1,9 +1,15 @@
 import config from '../config';
 import { Message } from 'discord.js';
+import { queues } from '../lib/queue'
+import { createSong, downloadSong } from '../lib/bilibili'
+
+let qs = queues();
 
 type CommandsString = 'help' | '114';
 
-type Commands = {[k in CommandsString]: (msg: Message) => void}
+type Commands = { [k in CommandsString]: (msg: Message) => void }
+
+
 
 const help = (msg: Message) => {
     const tosend: string[] = [
@@ -23,6 +29,13 @@ ${config.prefix}skip :: Skip to the next song`,
     msg.channel.send(tosend.join('\n'));
 };
 
+const add = (msg: Message) => {
+    let queue = qs.getQueue(msg.guild.id);
+    const sendMessage = msg.channel.send.bind(msg.channel)
+    const sendErrorMessage = (m: string) => sendMessage(`Error: ${m}`)
+    let re = /add\s+(?:av)?(\d+)/
+}
+
 // building commands & dispatcher
 
 const commands: Commands = {
@@ -31,7 +44,7 @@ const commands: Commands = {
 };
 
 export const dispatch: (msg: Message) => void = (msg) => {
-    const option = msg.content.toLowerCase().slice(config.prefix.length).split(' ').shift();
+    const option = msg.content.slice(config.prefix.length).split(' ').shift();
     if (typeof option === "string") {
         if (option === 'help') {
             commands.help(msg);
