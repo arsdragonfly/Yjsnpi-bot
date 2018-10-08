@@ -2,7 +2,9 @@
 
 The stinkiest Discord bot ever. (realistically)
 
-Check out the [Contribution Guidelines](./CONTRIBUTING.md) if you want you make Yjsnpi-bot become better!
+Join the [Magictea Official Discord](https://discord.gg/8RVjgt4) or [author's Discord](https://discord.gg/7sWkRg2) to try it out or test latest features!
+
+Also, check out the [Contribution Guidelines](./CONTRIBUTING.md) if you want you make Yjsnpi-bot become better!
 
 ## How to set up
 
