@@ -9,13 +9,23 @@ Check out the [Contribution Guidelines](./CONTRIBUTING.md) if you want you make 
 Copy `config.example.ts` to `config.ts` and fill in a token obtained here:
 <https://discordapp.com/developers/applications/me>
 
-Then, install Annie from here for Bilibili access:
-<https://github.com/iawia002/annie>
+Then, install FFMpeg:
+```bash
+$ apt install ffmpeg
+```
+
+Then, install Annie for Bilibili access using 
+
+```bash
+$ go get github.com/iawia002/annie
+```
+
+or install Annie from here (remember to change config.ts accordingly): <https://github.com/iawia002/annie>
 
 Next, clone the directory and run
 
 ```bash
-npm install -g typescript
+$ npm install -g typescript
 ```
 
 After installing typescript, run

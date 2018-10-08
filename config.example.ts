@@ -4,11 +4,13 @@
 interface Config {
     readonly token: string;
     readonly prefix: string;
+    readonly anniePath: string;
 }
 
 let config: Config = {
     token: "Replace this with a valid token.",
-    prefix: "()"
+    prefix: "()",
+    anniePath: "~/go/bin/annie"
 };
 
 export default config;

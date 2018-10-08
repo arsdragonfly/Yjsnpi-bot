@@ -5,6 +5,7 @@ import { spawn } from 'promisify-child-process'
 import * as fp from 'lodash/fp'
 import * as song from '../lib/song'
 import * as glob from 'glob-promise'
+import config from '../config'
 
 const downloadTitle = (aid: number) =>
     Future.tryP(() =>
@@ -37,7 +38,7 @@ export const downloadSong = (song: song.Song) =>
         switch (status.tag) {
             case 'pending':
                 let pendingPath = status.pendingPath
-                return spawn('annie', ['-o', '/tmp/', '-O', pendingPath, 'av' + status.aid], { shell: true })
+                return spawn(config.anniePath, ['-o', '/tmp/', '-O', pendingPath, 'av' + status.aid], { shell: true })
                     .then(() => glob(`/tmp/${pendingPath}.*`))
                     .then((arr: string[]) => ((str: string | undefined) =>
                         str ? Promise.resolve(str) : Promise.reject('File not found.'))
