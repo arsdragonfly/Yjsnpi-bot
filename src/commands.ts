@@ -43,6 +43,7 @@ const add = (msg: Message) => {
         .map((str: string) => Number(str))
 
     let processSong = (song: song.Song) => {
+        msg.reply(`${song.status().title} has been added to the queue.`)
         queue.addSong(song)
         downloadSong(song).fork(song.toFail, song.toSuccess)
     }

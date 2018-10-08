@@ -8,9 +8,9 @@ interface Config {
 }
 
 let config: Config = {
-    token: "Replace this with a valid token.",
-    prefix: "()",
-    anniePath: "~/go/bin/annie"
+    token: 'Replace this with a valid token.',
+    prefix: '()',
+    anniePath: '~/go/bin/annie'
 };
 
 export default config;
