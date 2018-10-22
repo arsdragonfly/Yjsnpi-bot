@@ -38,7 +38,7 @@ const add = (msg: Message) => {
     const sendErrorMessage = (m: {}) => sendMessage(`Error: ${m}`)
 
     let re = /add\s+(?:av)?(\d+)/ //matches the aid
-    let aid = Option.of(re.exec(msg.content.slice(config.prefix.length)))
+    let aid = Option.of(re.exec(msg.content.slice(config.prefix.length).trim()))
         .flatMap((arr: string[]) => { arr.shift(); return Option.of(arr.shift()) })
         .map((str: string) => Number(str))
 
@@ -151,22 +151,26 @@ const commands: Commands = {
 };
 
 export const dispatch: (msg: Message) => void = (msg) => {
-    const option = msg.content.slice(config.prefix.length).split(' ').shift();
+    const option = msg.content.slice(config.prefix.length).trim().split(' ').shift();
     if (typeof option === "string") {
         if (option === 'help') {
             commands.help(msg);
         }
-        if (option === '114') {
+        else if (option === '114') {
             commands["114"](msg);
         }
-        if (option === 'add') {
+        else if (option === 'add') {
             commands.add(msg);
         }
-        if (option === 'queue') {
+        else if (option === 'queue') {
             commands.queue(msg);
         }
-        if (option === 'play') {
+        else if (option === 'play') {
             commands.play(msg);
+        }
+        else
+        {
+            msg.reply(`Invalid command. Use ${config.prefix}help to view available commands.`)
         }
     }
 };
