@@ -1,14 +1,14 @@
-import config from '../config';
-import { Message, VoiceConnection } from 'discord.js';
+import config from '../config'
+import { Message, VoiceConnection } from 'discord.js'
 import { queues, Queue, QueueStatus } from '../lib/queue'
 import * as song from '../lib/song'
 import { createSong, downloadSong } from '../lib/bilibili'
 import { Option } from 'funfix'
-import * as Future from 'fluture';
+import * as Future from 'fluture'
 
-let qs = queues();
+let qs = queues()
 
-type CommandsString = 'help' | '114' | 'add' | 'queue' | 'play';
+type CommandsString = 'help' | '114' | 'add' | 'queue' | 'play' | 'whatsnew';
 
 type Commands = { [k in CommandsString]: (msg: Message) => void }
 
@@ -29,8 +29,8 @@ ${config.prefix}resume :: Resume the music
 ${config.prefix}skip :: Skip to the next song`,
         '```',
     ];
-    msg.reply(tosend.join('\n'));
-};
+    msg.reply(tosend.join('\n'))
+}
 
 const add = (msg: Message) => {
     let queue = qs.getQueue(msg.guild.id)
@@ -147,8 +147,9 @@ const commands: Commands = {
     '114': (msg) => { msg.reply('514') },
     add,
     queue,
-    play
-};
+    play,
+    whatsnew: (msg) => {msg.reply(config.whatsnew)}
+}
 
 export const dispatch: (msg: Message) => void = (msg) => {
     const option = msg.content.slice(config.prefix.length).trim().split(' ').shift();
@@ -168,8 +169,11 @@ export const dispatch: (msg: Message) => void = (msg) => {
         else if (option === 'play') {
             commands.play(msg);
         }
+        else if (option === 'whatsnew') {
+            commands.whatsnew(msg);
+        }
         else {
             msg.reply(`Invalid command. Use ${config.prefix}help to view available commands.`)
         }
     }
-};
+}
