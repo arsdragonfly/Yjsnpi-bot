@@ -3,7 +3,7 @@ import config from '../config';
 import { dispatch } from './commands'
 const ffmpeg = require('ffmpeg-binaries')
 
-const client = new Client();
+const client = new Client()
 
 client.on('ready', () => {
     console.log('I am ready!')
@@ -13,12 +13,16 @@ client.on('ready', () => {
             name: `Ikisugi! | ${config.prefix}help`
         }
     })
-});
+})
 
 client.on('message', (msg) => {
     if (msg.content.startsWith(config.prefix)) {
         dispatch(msg);
     }
-});
+})
 
-client.login(config.token);
+client.on('error', (e) => console.error(e))
+
+client.on('warn', (e) => console.warn(e))
+
+client.login(config.token)
