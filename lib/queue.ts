@@ -1,4 +1,6 @@
 import * as song from './song'
+import { VoiceConnection } from 'discord.js'
+import config from '../config'
 
 interface Playing {
     readonly tag: 'playing'
@@ -18,6 +20,7 @@ interface Ready {
 }
 interface Stopped {
     readonly tag: 'stopped'
+    readonly time: number
 }
 
 export type QueueStatus = Playing | Paused | Ready | Stopped
@@ -26,13 +29,26 @@ export interface Queue {
     readonly addSong: (song: song.Song) => QueueStatus
     readonly status: () => QueueStatus
     readonly toString: () => string
-    readonly nextSong: () => QueueStatus
+    readonly nextSong: (vc: VoiceConnection) => QueueStatus
     readonly pause: () => QueueStatus
     readonly resume: () => QueueStatus
 }
 
 function queue(): Queue {
-    let status: QueueStatus = { tag: 'stopped' }
+    let status: QueueStatus = { tag: 'stopped', time: Date.now() }
+
+    // Constructor for the stopped state
+    const stopped: (voiceConnection: VoiceConnection) => Stopped = (vc) => {
+        let time = Date.now();
+
+        setTimeout(() => {
+            if (status.tag === 'stopped' && status.time === time) {
+                vc.disconnect();
+            }
+        }, config.voiceConnectionTimeout)
+
+        return { tag: 'stopped', time }
+    }
 
     return {
         addSong: (song) => {
@@ -57,17 +73,17 @@ function queue(): Queue {
                 case 'stopped': return `Queue is empty.`
             }
         },
-        nextSong: () => {
+        nextSong: (voiceConnection) => {
             switch (status.tag) {
                 case 'stopped':
                     return status
-                default: 
+                default:
                     let song = status.queue.shift()
                     if (song !== undefined) {
                         status = { tag: 'playing', song, queue: status.queue }
                         return status
                     } else {
-                        status = { tag: 'stopped'}
+                        status = stopped(voiceConnection)
                         return status
                     }
             }

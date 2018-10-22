@@ -1,5 +1,5 @@
 import config from '../config';
-import { Message } from 'discord.js';
+import { Message, VoiceConnection } from 'discord.js';
 import { queues, Queue, QueueStatus } from '../lib/queue'
 import * as song from '../lib/song'
 import { createSong, downloadSong } from '../lib/bilibili'
@@ -69,14 +69,14 @@ const play = (msg: Message) => {
         }
     })
 
-    let playQueue = (queue: Queue) => {
+    let playQueue = (queue: Queue, voiceConnection: VoiceConnection) => {
         const processQueueStatus = (status: QueueStatus) => {
             if (status.tag === 'playing') {
                 let songStatus = status.song.status()
                 switch (songStatus.tag) {
                     case 'fail':
                         msg.reply(`${songStatus.title}, skipping.`)
-                        playQueue(queue) //Play next song
+                        processQueueStatus(queue.nextSong(voiceConnection))
                         break
                     case 'pending':
                         setTimeout(() => processQueueStatus(status), 500)
@@ -108,20 +108,20 @@ const play = (msg: Message) => {
 
                             dispatcher.on('end', () => {
                                 collector.stop()
-                                playQueue(queue)
+                                processQueueStatus(queue.nextSong(voiceConnection))
                             })
 
                             dispatcher.on('error', (err) => {
                                 msg.reply(`Error: ${err}`)
                                 collector.stop()
-                                playQueue(queue)
+                                processQueueStatus(queue.nextSong(voiceConnection))
                             })
                         }
                         break
                 }
             }
         }
-        processQueueStatus(queue.nextSong())
+        processQueueStatus(queue.nextSong(voiceConnection))
     }
 
     switch (queue.status().tag) {
@@ -132,7 +132,7 @@ const play = (msg: Message) => {
             msg.reply(`Add some songs to the queue first with ${config.prefix}add`)
             break
         case 'ready':
-            joinChannel.fork(msg.reply.bind(msg), () => playQueue(queue))
+            joinChannel.fork(msg.reply.bind(msg), (voiceConnection) => playQueue(queue, voiceConnection))
             break
         case 'paused':
             msg.reply(`Use ${config.prefix}resume to resume playing.`)
@@ -168,8 +168,7 @@ export const dispatch: (msg: Message) => void = (msg) => {
         else if (option === 'play') {
             commands.play(msg);
         }
-        else
-        {
+        else {
             msg.reply(`Invalid command. Use ${config.prefix}help to view available commands.`)
         }
     }
