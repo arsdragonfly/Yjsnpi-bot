@@ -37,6 +37,7 @@
     "node-opus": "^0.3.0",
     "promisify-child-process": "^2.1.2",
     "sodium": "^2.0.3",
+    "strict-event-emitter-types": "^2.0.0",
     "superagent": "^3.8.3",
     "tmp-promise": "^1.0.5"
   },

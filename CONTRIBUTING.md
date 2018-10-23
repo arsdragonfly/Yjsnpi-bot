@@ -2,7 +2,7 @@
 
 Welcome! We're very glad to receive your contribution, and you don't have to be a homo to contribute! (≧Д≦) 
 
-In order to make your pull requests merged more easily, here're a few little tips regarding the code (mostly what you'd expect from [Douglas Crockford](http://shop.oreilly.com/product/9780596517748.do)):
+In order to make your pull requests merged more easily, here're a few little tips regarding the code (mostly what you'd expect from [Douglas Crockford](http://shop.oreilly.com/product/9780596517748.do)); All of the following are applicable to code specific to this project, but rules can be relaxed when it comes to code calling external libraries.
 
 * Always use ```strict``` TypeScript.
 * No ```new```.
@@ -19,3 +19,4 @@ In order to make your pull requests merged more easily, here're a few little tip
 
   If you _really_ need to index into arrays, be sure to wrap every value with ```Option.of()```.
 * No ```async```/```await```; instead, use [Fluture](https://github.com/fluture-js/Fluture)```.tryP()``` or ```.encaseP()``` to wrap up ```Promise```s and force yourself to handle every error explicitly.
+* No semicolon.

@@ -1,10 +1,10 @@
 import config from '../config'
-import { Message, VoiceConnection } from 'discord.js'
+import { Message, VoiceConnection, RichEmbed } from 'discord.js'
 import { queues, Queue, QueueStatus } from '../lib/queue'
-import * as song from '../lib/song'
-import { createSong, downloadSong } from '../lib/bilibili'
+import { bilibiliSong, BilibiliSong } from '../lib/bilibili'
 import { Option } from 'funfix'
 import * as Future from 'fluture'
+import * as path from 'path'
 
 let qs = queues()
 
@@ -42,14 +42,30 @@ const add = (msg: Message) => {
         .flatMap((arr: string[]) => { arr.shift(); return Option.of(arr.shift()) })
         .map((str: string) => Number(str))
 
-    let processSong = (song: song.Song) => {
-        msg.reply(`${song.status().title} has been added to the queue.`)
+    let processSong = (bs: BilibiliSong) => {
+        let song = bs.song()
+        let cover = bs.song().cover()
         queue.addSong(song)
-        downloadSong(song).fork(song.toFail, song.toSuccess)
+        bs.downloadSong()
+        let embed = new RichEmbed()
+            .setColor("#00a5db")
+            .setAuthor(msg.author.username)
+            .setTitle(song.status().title)
+            .setURL(`https://www.bilibili.com/video/av${song.status().aid}/`)
+            .setDescription("now added to the queue.")
+        cover.eventEmitter().on('fail', () => msg.reply({ embed }))
+        cover.eventEmitter().on('success', (fullPath: string) => {
+            let basename = path.basename(fullPath)
+            msg.reply({
+                embed: embed.attachFile({ attachment: fullPath, name: basename })
+                    .setThumbnail(`attachment://${basename}`)
+            })
+        })
+        bs.downloadCover()
     }
 
     aid.fold(() => sendErrorMessage('Please enter a valid AV number.'),
-        (aid: number) => { createSong(aid).fork(sendErrorMessage, processSong) })
+        (aid: number) => { bilibiliSong({ aid }).fork(sendErrorMessage, processSong) })
 }
 
 const queue = (msg: Message) => {
@@ -148,7 +164,7 @@ const commands: Commands = {
     add,
     queue,
     play,
-    whatsnew: (msg) => {msg.reply(config.whatsnew)}
+    whatsnew: (msg) => { msg.reply(config.whatsnew) }
 }
 
 export const dispatch: (msg: Message) => void = (msg) => {
