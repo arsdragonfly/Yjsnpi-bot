@@ -6,7 +6,7 @@ interface Config {
     readonly prefix: string
     readonly anniePath: string
     // Timeout of voice channels in milliseconds
-    readonly voiceChannelTimeout: number
+    readonly voiceConnectionTimeout: number
     readonly whatsnew: string
 }
 
@@ -14,7 +14,7 @@ let config: Config = {
     token: 'Replace this with a valid token.',
     prefix: '()',
     anniePath: '~/go/bin/annie',
-    voiceChannelTimeout: 300000,
+    voiceConnectionTimeout: 300000,
     whatsnew: [
         '```asciidoc',
         `
