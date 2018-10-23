@@ -23,6 +23,7 @@ const help = (msg: Message) => {
 ${config.prefix}add :: Add a Bilibili video to the queue
 ${config.prefix}queue :: Show the current queue
 ${config.prefix}play :: Play queued music
+${config.prefix}whatsnew :: See what's new
 = Music Control =
 ${config.prefix}pause :: Pause the music
 ${config.prefix}resume :: Resume the music
@@ -106,19 +107,22 @@ const play = (msg: Message) => {
                             let dispatcher = msg.guild.voiceConnection.playFile(songStatus.path)
                             let collector = msg.channel.createCollector(m => m)
                             collector.on('message', (m: Message) => {
-                                if (m.content.startsWith(`${config.prefix}pause`)) {
-                                    msg.channel.send(`Paused ${songStatus.title}.`)
-                                    dispatcher.pause()
-                                    queue.pause()
-                                }
-                                else if (m.content.startsWith(`${config.prefix}resume`)) {
-                                    msg.channel.send(`Resumed ${songStatus.title}.`)
-                                    dispatcher.resume()
-                                    queue.resume()
-                                }
-                                else if (m.content.startsWith(`${config.prefix}skip`)) {
-                                    msg.channel.send(`Skipped ${songStatus.title}.`)
-                                    dispatcher.end()
+                                if (m.content.startsWith(`${config.prefix}`)) {
+                                    const option = m.content.slice(config.prefix.length).trim().split(' ').shift()
+                                    if (option === 'pause') {
+                                        msg.channel.send(`Paused ${songStatus.title}.`)
+                                        dispatcher.pause()
+                                        queue.pause()
+                                    }
+                                    else if (option === 'resume') {
+                                        msg.channel.send(`Resumed ${songStatus.title}.`)
+                                        dispatcher.resume()
+                                        queue.resume()
+                                    }
+                                    else if (option === 'skip') {
+                                        msg.channel.send(`Skipped ${songStatus.title}.`)
+                                        dispatcher.end()
+                                    }
                                 }
                             })
 
@@ -189,7 +193,10 @@ export const dispatch: (msg: Message) => void = (msg) => {
             commands.whatsnew(msg);
         }
         else {
-            msg.reply(`Invalid command. Use ${config.prefix}help to view available commands.`)
+            // Temp workaround
+            if (!(option === 'pause' || option === 'resume' || option === 'skip')) {
+                msg.reply(`Invalid command. Use ${config.prefix}help to view available commands.`)
+            }
         }
     }
 }
