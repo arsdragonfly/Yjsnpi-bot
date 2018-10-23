@@ -53,7 +53,8 @@ const add = (msg: Message) => {
             .setAuthor(msg.author.username)
             .setTitle(song.status().title)
             .setURL(`https://www.bilibili.com/video/av${song.status().aid}/`)
-            .setDescription("now added to the queue.")
+            .setDescription(song.status().desc)
+            .addField('Now added to the queue.', `${config.prefix}queue shows current queue; Kick off with ${config.prefix}play!`)
         cover.eventEmitter().on('fail', () => msg.reply({ embed }))
         cover.eventEmitter().on('success', (fullPath: string) => {
             let basename = path.basename(fullPath)

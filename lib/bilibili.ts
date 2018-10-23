@@ -33,11 +33,13 @@ const downloadMetadata = (aid: number) =>
             .get('https://api.imjad.cn/bilibili/v2/')
             .query({ aid })
             .then(
-                ((f, g) => (res: request.Response) => ({
+                ((f, g, h) => (res: request.Response) => ({
                     title: f(res),
-                    coverUrl: g(res)
+                    coverUrl: g(res),
+                    desc: h(res)
                 }))(fp.compose(errorHandler, fp.get(['body', 'data', 'title'])),
-                    fp.compose(errorHandler, fp.get(['body', 'data', 'pic']))))
+                    fp.compose(errorHandler, fp.get(['body', 'data', 'pic'])),
+                    fp.compose(errorHandler, fp.get(['body', 'data', 'desc']))))
     })
 
 // Not sure if it's fine to run it in parallel.
@@ -100,7 +102,7 @@ export function bilibiliSong(spec: BilibiliSongSpec): Future.FutureInstance<{}, 
     // This does look ugly; Deal with the typing and stuff later
     return Future
         .both(Future.both(downloadMetadata(aid), generatePath), generatePath)
-        .map(([[metadata, pendingPath], coverPath]) => song.song({ title: metadata.title, coverUrl: metadata.coverUrl, coverPath, pendingPath, aid }))
+        .map(([[metadata, pendingPath], coverPath]) => song.song({ title: metadata.title, coverUrl: metadata.coverUrl, coverPath, pendingPath, aid, desc: metadata.desc}))
         .map((song: song.Song) => ({
             song: () => song,
             downloadSong: downloadSong(song),

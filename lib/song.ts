@@ -69,6 +69,7 @@ export interface SongSpec {
     readonly coverPath: string
     readonly pendingPath: string
     readonly aid: number
+    readonly desc: string
 }
 
 export interface Pending {
@@ -76,12 +77,14 @@ export interface Pending {
     readonly title: string
     readonly pendingPath: string
     readonly aid: number
+    readonly desc: string
 }
 
 export interface Fail {
     readonly tag: 'fail'
     readonly title: string
     readonly aid: number
+    readonly desc: string
 }
 
 export interface Success {
@@ -90,6 +93,7 @@ export interface Success {
     //full path of the download file
     readonly path: string
     readonly aid: number
+    readonly desc: string
 }
 
 export type SongStatus = Pending | Fail | Success
@@ -104,20 +108,20 @@ export interface Song {
 }
 
 export function song(spec: SongSpec): Song {
-    let { title, coverUrl, coverPath, pendingPath, aid } = spec
-    let status: SongStatus = { tag: 'pending', title, pendingPath, aid }
+    let { title, coverUrl, coverPath, pendingPath, aid, desc } = spec
+    let status: SongStatus = { tag: 'pending', title, pendingPath, aid, desc }
     let cover: Cover.Cover = Cover.cover({ coverUrl, pendingPath: coverPath })
     let ee: SongEventEmitter = new EventEmitter
 
     ee.on('fail', () => {
         if (status.tag === 'pending') {
-            status = { tag: 'fail', title: `(Download Failed! (≧Д≦)) ${title}`, aid: status.aid }
+            status = { tag: 'fail', title: `(Download Failed! (≧Д≦)) ${title}`, aid: status.aid, desc: status.desc}
         }
     })
 
     ee.on('success', (fullPath: string) => {
         if (status.tag === 'pending') {
-            status = { tag: 'success', title, path: fullPath, aid }
+            status = { tag: 'success', title, path: fullPath, aid, desc: status.desc }
         }
     })
 

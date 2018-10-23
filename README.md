@@ -1,6 +1,10 @@
 # YJSNPI Bot
 
-The stinkiest Discord bot ever. (realistically)
+![example](example.png)
+
+This bot has absolutely no Inmu elements. (realistically)
+
+[Click here](https://discordbots.org/bot/479293634831843328) to add this bot to your server!
 
 Join the [Magictea Official Discord](https://discord.gg/8RVjgt4) or [author's Discord](https://discord.gg/7sWkRg2) to try it out or test latest features!
 
