@@ -76,7 +76,7 @@ const downloadCover = (cover: song.Cover.Cover) => () => {
         switch (status.tag) {
             case 'pending':
                 const { pendingPath, coverUrl } = status
-                const extension = path.extname((new URL(coverUrl)).pathname)
+                const extension = path.extname((new url.URL(coverUrl)).pathname)
                 const fullPath = `${pendingPath}.${extension}`
                 const stream = fs.createWriteStream(fullPath)
                 const req = request.get(coverUrl).set({ 'Referer': 'https://www.bilibili.com/' })
