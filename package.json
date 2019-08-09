@@ -26,7 +26,8 @@
     "@types/superagent": "^3.8.4",
     "@types/tmp": "0.0.33",
     "bufferutil": "^4.0.0",
-    "discord.js": "^11.4.2",
+    "discord-akairo": "^7.5.6",
+    "discord.js": "^11.5.1",
     "erlpack": "github:discordapp/erlpack",
     "ffmpeg-binaries": "^4.0.0",
     "fluture": "^10.1.0",
@@ -36,10 +37,13 @@
     "lodash": "^4.17.13",
     "node-opus": "^0.3.0",
     "promisify-child-process": "^2.1.2",
+    "sequelize": "^5.12.3",
     "sodium": "^2.0.3",
+    "sqlite": "^3.0.3",
     "strict-event-emitter-types": "^2.0.0",
     "superagent": "^3.8.3",
-    "tmp-promise": "^1.0.5"
+    "tmp-promise": "^1.0.5",
+    "tslint-config-standard": "^8.0.1"
   },
   "devDependencies": {
     "eslint": "^5.6.1",
