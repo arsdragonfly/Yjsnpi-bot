@@ -1,3 +1,19 @@
+import config from "../config";
+
+const { AkairoClient } = require('discord-akairo')
+
+const client = new AkairoClient(
+    {
+        prefix: config.prefix,
+        commandDirectory: './src/commands/'
+    }, {
+        disableEveryone: true
+    }
+)
+
+client.login(config.token)
+
+/*
 import { Client } from 'discord.js';
 import config from '../config';
 import { dispatch } from './commands'
@@ -26,3 +42,4 @@ client.on('error', (e) => console.error(e))
 client.on('warn', (e) => console.warn(e))
 
 client.login(config.token)
+*/
