@@ -2,29 +2,29 @@
 // before you start using the bot
 
 interface Config {
-    readonly token: string
-    readonly prefix: string
-    readonly anniePath: string
-    // Timeout of voice channels in milliseconds
-    readonly voiceConnectionTimeout: number
-    readonly whatsnew: string
+  readonly token: string;
+  readonly prefix: string;
+  readonly anniePath: string;
+  // Timeout of voice channels in milliseconds
+  readonly voiceConnectionTimeout: number;
+  readonly whatsnew: string;
 }
 
-let config: Config = {
-    token: 'Replace this with a valid token.',
-    prefix: '()',
-    anniePath: '~/go/bin/annie',
-    voiceConnectionTimeout: 300000,
-    whatsnew: [
-        '```asciidoc',
-`
+const config: Config = {
+  token: 'Replace this with a valid token.',
+  prefix: '()',
+  anniePath: '~/go/bin/annie',
+  voiceConnectionTimeout: 300000,
+  whatsnew: [
+    '```asciidoc',
+    `
 = 2018-10-22 =
 * Bot now automatically quits voice channel after idling for 5 minutes.
 * Supports displaying video cover.
 * Misc. improvements.
 `,
-        '```'
-    ].join('\n')
+    '```',
+  ].join('\n'),
 };
 
 export default config;
