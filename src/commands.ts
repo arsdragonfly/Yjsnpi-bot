@@ -113,7 +113,7 @@ const play = (msg: Message) => {
             const dispatcher = msg.guild.voiceConnection.playFile(audioStatus.path);
             console.log(audioStatus.path)
             const collector = msg.channel.createCollector(m => m);
-            collector.on('message', (m: Message) => {
+            collector.on('collect', (m: Message) => {
               if (m.content.startsWith(`${config.prefix}`)) {
                 const option = m.content
                   .slice(config.prefix.length)
