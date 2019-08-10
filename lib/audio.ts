@@ -75,6 +75,8 @@ export interface AudioSpec {
   readonly pendingPath: string;
   readonly url: string;
   readonly desc: string;
+  readonly downloadAudio: (audio: Audio) => Future.Cancel;
+  readonly downloadCover: (cover: Cover.Cover) => Future.Cancel;
 }
 
 export interface Pending {
@@ -109,6 +111,8 @@ export interface Audio {
   readonly status: () => AudioStatus;
   readonly cover: () => Cover.Cover;
   readonly eventEmitter: () => AudioEventEmitter;
+  readonly downloadAudio: (audio: Audio) => Future.Cancel;
+  readonly downloadCover: (cover: Cover.Cover) => Future.Cancel;
 }
 
 export function audio(spec: AudioSpec): Audio {
@@ -144,6 +148,8 @@ export function audio(spec: AudioSpec): Audio {
     status: () => status,
     cover: () => cover,
     eventEmitter: () => ee,
+    downloadAudio: spec.downloadAudio,
+    downloadCover: spec.downloadCover
   };
 }
 
@@ -151,7 +157,8 @@ const findFile = (path: string) => () => glob(`${path}.*`).then((arr: string[]) 
   arr.shift(),
 ));
 
-export const downloadAudio = (audio: Audio) => () => Future.fork<string, string>(() => audio.eventEmitter().emit('fail'))((fullPath: string) => audio.eventEmitter().emit('success', fullPath))(
+// downloading audio via annie which will probably work for every platform
+export const downloadAudio = (audio: Audio) => Future.fork<string, string>(() => audio.eventEmitter().emit('fail'))((fullPath: string) => audio.eventEmitter().emit('success', fullPath))(
   Future.attemptP(() => {
     const status = audio.status();
     switch (status.tag) {

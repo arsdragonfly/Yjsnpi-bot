@@ -109,8 +109,9 @@ interface Queues {
   readonly getQueue: (id: string) => Queue;
 }
 
+const qs: { [index: string]: Queue } = {};
+
 export function queues(): Queues {
-  const qs: { [index: string]: Queue } = {};
   return {
     getQueue: (id) => {
       if (!(id in qs)) {

@@ -7,7 +7,6 @@ interface Config {
   readonly anniePath: string;
   // Timeout of voice channels in milliseconds
   readonly voiceConnectionTimeout: number;
-  readonly whatsnew: string;
 }
 
 const config: Config = {
@@ -15,16 +14,6 @@ const config: Config = {
   prefix: '()',
   anniePath: '~/go/bin/annie',
   voiceConnectionTimeout: 300000,
-  whatsnew: [
-    '```asciidoc',
-    `
-= 2018-10-22 =
-* Bot now automatically quits voice channel after idling for 5 minutes.
-* Supports displaying video cover.
-* Misc. improvements.
-`,
-    '```',
-  ].join('\n'),
 };
 
 export default config;

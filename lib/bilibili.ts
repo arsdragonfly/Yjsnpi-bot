@@ -7,12 +7,6 @@ import * as url from 'url';
 import * as path from 'path';
 import * as libAudio from './audio';
 
-export interface BilibiliAudio {
-  readonly audio: () => libAudio.Audio;
-  readonly downloadAudio: () => Future.Cancel;
-  readonly downloadCover: () => Future.Cancel;
-}
-
 export interface BilibiliAudioSpec {
   readonly aid: number;
 }
@@ -64,7 +58,7 @@ const generatePath = Future.attemptP<string, string>(() => tmpName({ template: '
 ));
 
 
-const downloadCover = (cover: libAudio.Cover.Cover) => () => {
+const downloadCover = (cover: libAudio.Cover.Cover) => {
   const fail = () => cover.eventEmitter().emit('fail');
   const success = (fullPath: string) => cover.eventEmitter().emit('success', fullPath);
   return Future.fork<string, string>(fail)(success)(
@@ -94,7 +88,7 @@ const downloadCover = (cover: libAudio.Cover.Cover) => () => {
   );
 };
 
-export function bilibiliAudio(spec: BilibiliAudioSpec): Future.FutureInstance<{}, BilibiliAudio> {
+export function bilibiliAudio(spec: BilibiliAudioSpec): Future.FutureInstance<{}, libAudio.Audio> {
   const { aid } = spec;
   // This does look ugly; Deal with the typing and stuff later
   const metadata = Future.both<string, BilibiliMetadata, string>(downloadMetadata(aid))(
@@ -103,7 +97,7 @@ export function bilibiliAudio(spec: BilibiliAudioSpec): Future.FutureInstance<{}
   const metadataWithCover = Future.both<string, [BilibiliMetadata, string], string>(metadata)(
     generatePath,
   );
-  const bilibiliAudio_ = Future.map<string, [[BilibiliMetadata, string], string], libAudio.Audio>(
+  const bilibiliAudio = Future.map<string, [[BilibiliMetadata, string], string], libAudio.Audio>(
     ([[metadata, pendingPath], coverPath]) => libAudio.audio({
       title: metadata.title,
       coverUrl: metadata.coverUrl,
@@ -111,12 +105,9 @@ export function bilibiliAudio(spec: BilibiliAudioSpec): Future.FutureInstance<{}
       pendingPath,
       url: `https://www.bilibili.com/video/av${aid}/`,
       desc: metadata.desc,
+      downloadAudio: libAudio.downloadAudio,
+      downloadCover: downloadCover
     }),
   )(metadataWithCover);
-  const bilibiliAudio = Future.map<string, libAudio.Audio, BilibiliAudio>((audio: libAudio.Audio) => ({
-    audio: () => audio,
-    downloadAudio: libAudio.downloadAudio(audio),
-    downloadCover: downloadCover(audio.cover()),
-  }))(bilibiliAudio_);
   return bilibiliAudio;
 }
