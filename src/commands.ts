@@ -53,7 +53,7 @@ const add = (msg: Message) => {
       .setColor('#00a5db')
       .setAuthor(msg.author.username)
       .setTitle(audio.status().title)
-      .setURL(`https://www.bilibili.com/video/av${audio.status().aid}/`)
+      .setURL(audio.status().url)
       .setDescription(audio.status().desc)
       .addField(
         'Now added to the queue.',

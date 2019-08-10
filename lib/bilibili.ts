@@ -78,7 +78,7 @@ const downloadAudio = (audio: audio.Audio) => () => Future.fork<string, string>(
         const { pendingPath } = status;
         return spawn(
           config.anniePath,
-          ['-o', path.dirname(pendingPath), '-O', path.basename(pendingPath), `av${status.aid}`],
+          ['-o', path.dirname(pendingPath), '-O', path.basename(pendingPath), status.url],
           { shell: true },
         ).then(findFile(pendingPath), err => `failed to launch annie because of ${err}`);
       default:
@@ -132,7 +132,7 @@ export function bilibiliAudio(spec: BilibiliAudioSpec): Future.FutureInstance<{}
       coverUrl: metadata.coverUrl,
       coverPath,
       pendingPath,
-      aid,
+      url: `https://www.bilibili.com/video/av${aid}/`,
       desc: metadata.desc,
     }),
   )(metadataWithCover);

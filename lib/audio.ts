@@ -68,7 +68,7 @@ export interface AudioSpec {
   readonly coverUrl: string;
   readonly coverPath: string;
   readonly pendingPath: string;
-  readonly aid: number;
+  readonly url: string;
   readonly desc: string;
 }
 
@@ -76,14 +76,14 @@ export interface Pending {
   readonly tag: 'pending';
   readonly title: string;
   readonly pendingPath: string;
-  readonly aid: number;
+  readonly url: string;
   readonly desc: string;
 }
 
 export interface Fail {
   readonly tag: 'fail';
   readonly title: string;
-  readonly aid: number;
+  readonly url: string;
   readonly desc: string;
 }
 
@@ -92,7 +92,7 @@ export interface Success {
   readonly title: string;
   // full path of the download file
   readonly path: string;
-  readonly aid: number;
+  readonly url: string;
   readonly desc: string;
 }
 
@@ -108,10 +108,10 @@ export interface Audio {
 
 export function audio(spec: AudioSpec): Audio {
   const {
-    title, coverUrl, coverPath, pendingPath, aid, desc,
+    title, coverUrl, coverPath, pendingPath, url, desc,
   } = spec;
   let status: AudioStatus = {
-    tag: 'pending', title, pendingPath, aid, desc,
+    tag: 'pending', title, pendingPath, url, desc,
   };
   const cover: Cover.Cover = Cover.cover({ coverUrl, pendingPath: coverPath });
   const ee: AudioEventEmitter = new EventEmitter();
@@ -121,7 +121,7 @@ export function audio(spec: AudioSpec): Audio {
       status = {
         tag: 'fail',
         title: `(Download Failed! (≧Д≦)) ${title}`,
-        aid: status.aid,
+        url: status.url,
         desc: status.desc,
       };
     }
@@ -130,7 +130,7 @@ export function audio(spec: AudioSpec): Audio {
   ee.on('success', (fullPath: string) => {
     if (status.tag === 'pending') {
       status = {
-        tag: 'success', title, path: fullPath, aid, desc: status.desc,
+        tag: 'success', title, path: fullPath, url, desc: status.desc,
       };
     }
   });
