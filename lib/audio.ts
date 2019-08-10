@@ -1,5 +1,10 @@
 import StrictEventEmitter from 'strict-event-emitter-types';
 import { EventEmitter } from 'events';
+import * as Future from 'fluture';
+import config from '../config';
+import { spawn } from 'promisify-child-process';
+import * as path from 'path';
+import * as glob from 'glob-promise';
 
 interface Events {
   fail: () => void;
@@ -141,3 +146,24 @@ export function audio(spec: AudioSpec): Audio {
     eventEmitter: () => ee,
   };
 }
+
+const findFile = (path: string) => () => glob(`${path}.*`).then((arr: string[]) => ((str: string | undefined) => (str ? Promise.resolve(str) : Promise.reject('File not found.')))(
+  arr.shift(),
+));
+
+export const downloadAudio = (audio: Audio) => () => Future.fork<string, string>(() => audio.eventEmitter().emit('fail'))((fullPath: string) => audio.eventEmitter().emit('success', fullPath))(
+  Future.attemptP(() => {
+    const status = audio.status();
+    switch (status.tag) {
+      case 'pending':
+        const { pendingPath } = status;
+        return spawn(
+          config.anniePath,
+          ['-o', path.dirname(pendingPath), '-O', path.basename(pendingPath), status.url],
+          { shell: true },
+        ).then(findFile(pendingPath), err => `failed to launch annie because of ${err}`);
+      default:
+        return Promise.reject('Internal error.');
+    }
+  }),
+);
