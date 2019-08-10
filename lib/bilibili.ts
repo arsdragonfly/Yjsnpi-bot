@@ -1,29 +1,29 @@
-import * as request from 'superagent';
-import { tmpName } from 'tmp-promise';
-import * as Future from 'fluture';
-import * as fp from 'lodash/fp';
-import * as fs from 'fs';
-import * as url from 'url';
-import * as path from 'path';
-import * as libAudio from './audio';
+import * as request from 'superagent'
+import { tmpName } from 'tmp-promise'
+import * as Future from 'fluture'
+import * as fp from 'lodash/fp'
+import * as fs from 'fs'
+import * as url from 'url'
+import * as path from 'path'
+import * as libAudio from './audio'
 
 export interface BilibiliAudioSpec {
-  readonly aid: number;
+  readonly aid: number
 }
 
 interface BilibiliMetadata {
-  readonly title: string;
-  readonly coverUrl: string;
-  readonly desc: string;
+  readonly title: string
+  readonly coverUrl: string
+  readonly desc: string
 }
 
 const downloadMetadata = (aid: number) => Future.attemptP<string, BilibiliMetadata>(() => {
   const errorHandler = (t: String | undefined) => {
     if (t !== undefined) {
-      return String(t);
+      return String(t)
     }
-    throw 'Failed to retrieve title or video cover.';
-  };
+    throw new Error('Failed to retrieve title or video cover.')
+  }
   const promise = request
     .get('https://api.imjad.cn/bilibili/v2/')
     .query({ aid })
@@ -31,72 +31,71 @@ const downloadMetadata = (aid: number) => Future.attemptP<string, BilibiliMetada
       ((f, g, h) => (res: request.Response) => ({
         title: f(res),
         coverUrl: g(res),
-        desc: h(res),
+        desc: h(res)
       }))(
         fp.compose(
           errorHandler,
-          fp.get(['body', 'data', 'title']),
+          fp.get(['body', 'data', 'title'])
         ),
         fp.compose(
           errorHandler,
-          fp.get(['body', 'data', 'pic']),
+          fp.get(['body', 'data', 'pic'])
         ),
         fp.compose(
           errorHandler,
-          fp.get(['body', 'data', 'desc']),
-        ),
+          fp.get(['body', 'data', 'desc'])
+        )
       ),
-      () => Promise.reject('Failed to retrieve title or video cover'),
-    );
-  return promise;
-});
+      () => Promise.reject('Failed to retrieve title or video cover')
+    )
+  return promise
+})
 
 // Not sure if it's fine to run it in parallel.
 // Pretending that this problem doesn't exist now.
 const generatePath = Future.attemptP<string, string>(() => tmpName({ template: '/tmp/tmp-XXXXXX' }).then(
-  (str: string) => (str && Promise.resolve(str)) || Promise.reject('Failed to generate path'),
-));
-
+  (str: string) => (str && Promise.resolve(str)) || Promise.reject('Failed to generate path')
+))
 
 const downloadCover = (cover: libAudio.Cover.Cover) => {
-  const fail = () => cover.eventEmitter().emit('fail');
-  const success = (fullPath: string) => cover.eventEmitter().emit('success', fullPath);
+  const fail = () => cover.eventEmitter().emit('fail')
+  const success = (fullPath: string) => cover.eventEmitter().emit('success', fullPath)
   return Future.fork<string, string>(fail)(success)(
     Future.attemptP(() => {
-      const status = cover.status();
+      const status = cover.status()
       switch (status.tag) {
         case 'pending':
-          const { pendingPath, coverUrl } = status;
-          const extension = path.extname(new url.URL(coverUrl).pathname);
-          const fullPath = `${pendingPath}.${extension}`;
-          const stream = fs.createWriteStream(fullPath);
-          const req = request.get(coverUrl).set({ Referer: 'https://www.bilibili.com/' });
-          req.pipe(stream);
+          const { pendingPath, coverUrl } = status
+          const extension = path.extname(new url.URL(coverUrl).pathname)
+          const fullPath = `${pendingPath}.${extension}`
+          const stream = fs.createWriteStream(fullPath)
+          const req = request.get(coverUrl).set({ Referer: 'https://www.bilibili.com/' })
+          req.pipe(stream)
           const p: Promise<string> = new Promise((resolve, reject) => {
             stream.on('finish', () => {
-              resolve(fullPath);
-            });
-            stream.on('error', (err) => {
-              reject('Failed to download cover.');
-            });
-          });
-          return p;
+              resolve(fullPath)
+            })
+            stream.on('error', () => {
+              reject('Failed to download cover.')
+            })
+          })
+          return p
         default:
-          return Promise.reject('Internal error.');
+          return Promise.reject('Internal error.')
       }
-    }),
-  );
-};
+    })
+  )
+}
 
-export function bilibiliAudio(spec: BilibiliAudioSpec): Future.FutureInstance<{}, libAudio.Audio> {
-  const { aid } = spec;
+export function bilibiliAudio (spec: BilibiliAudioSpec): Future.FutureInstance<{}, libAudio.Audio> {
+  const { aid } = spec
   // This does look ugly; Deal with the typing and stuff later
   const metadata = Future.both<string, BilibiliMetadata, string>(downloadMetadata(aid))(
-    generatePath,
-  );
+    generatePath
+  )
   const metadataWithCover = Future.both<string, [BilibiliMetadata, string], string>(metadata)(
-    generatePath,
-  );
+    generatePath
+  )
   const bilibiliAudio = Future.map<string, [[BilibiliMetadata, string], string], libAudio.Audio>(
     ([[metadata, pendingPath], coverPath]) => libAudio.audio({
       title: metadata.title,
@@ -107,7 +106,7 @@ export function bilibiliAudio(spec: BilibiliAudioSpec): Future.FutureInstance<{}
       desc: metadata.desc,
       downloadAudio: libAudio.downloadAudio,
       downloadCover: downloadCover
-    }),
-  )(metadataWithCover);
-  return bilibiliAudio;
+    })
+  )(metadataWithCover)
+  return bilibiliAudio
 }

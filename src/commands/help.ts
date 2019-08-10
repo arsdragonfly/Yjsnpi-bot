@@ -1,5 +1,5 @@
-import { Message } from 'discord.js';
-import config from '../../config';
+import { Message } from 'discord.js'
+import config from '../../config'
 
 export const help = (msg: Message) => {
   const tosend: string[] = [
@@ -15,7 +15,7 @@ ${config.prefix}whatsnew :: See what's new
 ${config.prefix}pause :: Pause the music
 ${config.prefix}resume :: Resume the music
 ${config.prefix}skip :: Skip the current music`,
-    '```',
-  ];
-  msg.reply(tosend.join('\n'));
-};
+    '```'
+  ]
+  msg.reply(tosend.join('\n')).catch()
+}

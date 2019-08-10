@@ -1,5 +1,5 @@
-import { Message } from 'discord.js';
+import { Message } from 'discord.js'
 
 export const ping = (msg: Message) => {
-    msg.reply('514');
+  msg.reply('514').catch()
 }

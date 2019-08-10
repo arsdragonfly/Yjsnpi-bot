@@ -1,4 +1,4 @@
-import { Message } from 'discord.js';
+import { Message } from 'discord.js'
 
 export const whatsnew = (msg: Message) => {
   const whatsnew = [
@@ -9,7 +9,7 @@ export const whatsnew = (msg: Message) => {
 * Supports displaying video cover.
 * Misc. improvements.
 `,
-    '```',
-  ].join('\n');
-  msg.reply(whatsnew);
-};
+    '```'
+  ].join('\n')
+  msg.reply(whatsnew).catch()
+}
