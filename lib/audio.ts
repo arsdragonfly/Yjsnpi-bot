@@ -11,8 +11,8 @@ interface Events {
   success: (fullPath: string) => void
 }
 
-// Stuff related to the cover image
-export namespace Cover {
+// Stuff related to the thumbnail image
+export namespace Thumbnail {
   export interface Events {
     fail: () => void
     success: (fullPath: string) => void
@@ -20,7 +20,7 @@ export namespace Cover {
 
   export interface Pending {
     readonly tag: 'pending'
-    readonly coverUrl: string
+    readonly thumbnailUrl: string
     readonly pendingPath: string
   }
 
@@ -33,24 +33,24 @@ export namespace Cover {
     readonly path: string
   }
 
-  export type CoverStatus = Pending | Fail | Success
+  export type ThumbnailStatus = Pending | Fail | Success
 
-  export type CoverEventEmitter = StrictEventEmitter<EventEmitter, Events>
+  export type ThumbnailEventEmitter = StrictEventEmitter<EventEmitter, Events>
 
-  export interface Cover {
-    readonly status: () => CoverStatus
-    readonly eventEmitter: () => CoverEventEmitter
+  export interface Thumbnail {
+    readonly status: () => ThumbnailStatus
+    readonly eventEmitter: () => ThumbnailEventEmitter
   }
 
-  export interface CoverSpec {
-    readonly coverUrl: string
+  export interface ThumbnailSpec {
+    readonly thumbnailUrl: string
     readonly pendingPath: string
   }
 
-  export function cover (spec: CoverSpec): Cover {
-    const { coverUrl, pendingPath } = spec
-    const ee: CoverEventEmitter = new EventEmitter()
-    let status: CoverStatus = { tag: 'pending', coverUrl, pendingPath }
+  export function thumbnail (spec: ThumbnailSpec): Thumbnail {
+    const { thumbnailUrl, pendingPath } = spec
+    const ee: ThumbnailEventEmitter = new EventEmitter()
+    let status: ThumbnailStatus = { tag: 'pending', thumbnailUrl, pendingPath }
     ee.on('fail', () => {
       if (status.tag === 'pending') {
         status = { tag: 'fail' }
@@ -70,13 +70,13 @@ export namespace Cover {
 
 export interface AudioSpec {
   readonly title: string
-  readonly coverUrl: string
-  readonly coverPath: string
+  readonly thumbnailUrl: string
+  readonly thumbnailPath: string
   readonly pendingPath: string
   readonly url: string
   readonly desc: string
   readonly downloadAudio: (audio: Audio) => Future.Cancel
-  readonly downloadCover: (cover: Cover.Cover) => Future.Cancel
+  readonly downloadThumbnail: (thumbnail: Thumbnail.Thumbnail) => Future.Cancel
 }
 
 export interface Pending {
@@ -109,20 +109,20 @@ export type AudioEventEmitter = StrictEventEmitter<EventEmitter, Events>
 
 export interface Audio {
   readonly status: () => AudioStatus
-  readonly cover: () => Cover.Cover
+  readonly thumbnail: () => Thumbnail.Thumbnail
   readonly eventEmitter: () => AudioEventEmitter
   readonly downloadAudio: (audio: Audio) => Future.Cancel
-  readonly downloadCover: (cover: Cover.Cover) => Future.Cancel
+  readonly downloadThumbnail: (thumbnail: Thumbnail.Thumbnail) => Future.Cancel
 }
 
 export function audio (spec: AudioSpec): Audio {
   const {
-    title, coverUrl, coverPath, pendingPath, url, desc
+    title, thumbnailUrl, thumbnailPath, pendingPath, url, desc
   } = spec
   let status: AudioStatus = {
     tag: 'pending', title, pendingPath, url, desc
   }
-  const cover: Cover.Cover = Cover.cover({ coverUrl, pendingPath: coverPath })
+  const thumbnail: Thumbnail.Thumbnail = Thumbnail.thumbnail({ thumbnailUrl, pendingPath: thumbnailPath })
   const ee: AudioEventEmitter = new EventEmitter()
 
   ee.on('fail', () => {
@@ -146,10 +146,10 @@ export function audio (spec: AudioSpec): Audio {
 
   return {
     status: () => status,
-    cover: () => cover,
+    thumbnail: () => thumbnail,
     eventEmitter: () => ee,
     downloadAudio: spec.downloadAudio,
-    downloadCover: spec.downloadCover
+    downloadThumbnail: spec.downloadThumbnail
   }
 }
 

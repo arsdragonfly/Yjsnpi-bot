@@ -6,7 +6,7 @@ export const whatsnew = (msg: Message) => {
     `
 = 2018-10-22 =
 * Bot now automatically quits voice channel after idling for 5 minutes.
-* Supports displaying video cover.
+* Supports displaying video thumbnail.
 * Misc. improvements.
 `,
     '```'

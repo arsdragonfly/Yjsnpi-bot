@@ -31,7 +31,7 @@ export const add = (msg: Message) => {
   const audio = createAudio(msg)
 
   const processAudio = (audio: libAudio.Audio) => {
-    const cover = audio.cover()
+    const thumbnail = audio.thumbnail()
     queue.addAudio(audio)
     audio.downloadAudio(audio)
     const embed = new RichEmbed()
@@ -44,8 +44,8 @@ export const add = (msg: Message) => {
         'Now added to the queue.',
         `${config.prefix}queue shows current queue; Kick off with ${config.prefix}play!`
       )
-    cover.eventEmitter().on('fail', () => msg.reply({ embed }))
-    cover.eventEmitter().on('success', (fullPath: string) => {
+    thumbnail.eventEmitter().on('fail', () => msg.reply({ embed }))
+    thumbnail.eventEmitter().on('success', (fullPath: string) => {
       const basename = path.basename(fullPath)
       msg.reply({
         embed: embed
@@ -53,7 +53,7 @@ export const add = (msg: Message) => {
           .setThumbnail(`attachment://${basename}`)
       }).catch()
     })
-    audio.downloadCover(cover)
+    audio.downloadThumbnail(thumbnail)
   }
 
   audio.fold(

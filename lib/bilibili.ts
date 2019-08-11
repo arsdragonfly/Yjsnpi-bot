@@ -13,7 +13,7 @@ export interface BilibiliAudioSpec {
 
 interface BilibiliMetadata {
   readonly title: string
-  readonly coverUrl: string
+  readonly thumbnailUrl: string
   readonly desc: string
 }
 
@@ -22,7 +22,7 @@ const downloadMetadata = (aid: number) => Future.attemptP<string, BilibiliMetada
     if (t !== undefined) {
       return String(t)
     }
-    throw new Error('Failed to retrieve title or video cover.')
+    throw new Error('Failed to retrieve title or video thumbnail.')
   }
   const promise = request
     .get('https://api.imjad.cn/bilibili/v2/')
@@ -30,7 +30,7 @@ const downloadMetadata = (aid: number) => Future.attemptP<string, BilibiliMetada
     .then(
       ((f, g, h) => (res: request.Response) => ({
         title: f(res),
-        coverUrl: g(res),
+        thumbnailUrl: g(res),
         desc: h(res)
       }))(
         fp.compose(
@@ -46,37 +46,35 @@ const downloadMetadata = (aid: number) => Future.attemptP<string, BilibiliMetada
           fp.get(['body', 'data', 'desc'])
         )
       ),
-      () => Promise.reject('Failed to retrieve title or video cover')
+      () => Promise.reject('Failed to retrieve title or video thumbnail.')
     )
   return promise
 })
 
-// Not sure if it's fine to run it in parallel.
-// Pretending that this problem doesn't exist now.
 const generatePath = Future.attemptP<string, string>(() => tmpName({ template: '/tmp/tmp-XXXXXX' }).then(
   (str: string) => (str && Promise.resolve(str)) || Promise.reject('Failed to generate path')
 ))
 
-const downloadCover = (cover: libAudio.Cover.Cover) => {
-  const fail = () => cover.eventEmitter().emit('fail')
-  const success = (fullPath: string) => cover.eventEmitter().emit('success', fullPath)
+const downloadThumbnail = (thumbnail: libAudio.Thumbnail.Thumbnail) => {
+  const fail = () => thumbnail.eventEmitter().emit('fail')
+  const success = (fullPath: string) => thumbnail.eventEmitter().emit('success', fullPath)
   return Future.fork<string, string>(fail)(success)(
     Future.attemptP(() => {
-      const status = cover.status()
+      const status = thumbnail.status()
       switch (status.tag) {
         case 'pending':
-          const { pendingPath, coverUrl } = status
-          const extension = path.extname(new url.URL(coverUrl).pathname)
+          const { pendingPath, thumbnailUrl } = status
+          const extension = path.extname(new url.URL(thumbnailUrl).pathname)
           const fullPath = `${pendingPath}.${extension}`
           const stream = fs.createWriteStream(fullPath)
-          const req = request.get(coverUrl).set({ Referer: 'https://www.bilibili.com/' })
+          const req = request.get(thumbnailUrl).set({ Referer: 'https://www.bilibili.com/' })
           req.pipe(stream)
           const p: Promise<string> = new Promise((resolve, reject) => {
             stream.on('finish', () => {
               resolve(fullPath)
             })
             stream.on('error', () => {
-              reject('Failed to download cover.')
+              reject('Failed to download thumbnail.')
             })
           })
           return p
@@ -93,20 +91,20 @@ export function bilibiliAudio (spec: BilibiliAudioSpec): Future.FutureInstance<{
   const metadata = Future.both<string, BilibiliMetadata, string>(downloadMetadata(aid))(
     generatePath
   )
-  const metadataWithCover = Future.both<string, [BilibiliMetadata, string], string>(metadata)(
+  const metadataWithThumbnail = Future.both<string, [BilibiliMetadata, string], string>(metadata)(
     generatePath
   )
   const bilibiliAudio = Future.map<string, [[BilibiliMetadata, string], string], libAudio.Audio>(
-    ([[metadata, pendingPath], coverPath]) => libAudio.audio({
+    ([[metadata, pendingPath], thumbnailPath]) => libAudio.audio({
       title: metadata.title,
-      coverUrl: metadata.coverUrl,
-      coverPath,
+      thumbnailUrl: metadata.thumbnailUrl,
+      thumbnailPath,
       pendingPath,
       url: `https://www.bilibili.com/video/av${aid}/`,
       desc: metadata.desc,
       downloadAudio: libAudio.downloadAudio,
-      downloadCover: downloadCover
+      downloadThumbnail: downloadThumbnail
     })
-  )(metadataWithCover)
+  )(metadataWithThumbnail)
   return bilibiliAudio
 }
