@@ -7,7 +7,7 @@ export const help = (msg: Message) => {
     `YJSNPI Bot Commands
 -------------------
 = General =
-${config.prefix}add :: Add a Bilibili video to the queue
+${config.prefix}add :: Add a Bilibili/YouTube video to the queue
 ${config.prefix}queue :: Show the current queue
 ${config.prefix}play :: Play queued music
 ${config.prefix}whatsnew :: See what's new

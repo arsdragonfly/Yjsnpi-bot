@@ -20,7 +20,7 @@ Then, install FFMpeg:
 $ apt install ffmpeg
 ```
 
-Then, install Annie for Bilibili access using 
+Then, install Annie for Bilibili/YouTube access using 
 
 ```bash
 $ go get github.com/iawia002/annie
