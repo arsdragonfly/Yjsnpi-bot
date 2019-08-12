@@ -6,11 +6,25 @@ import { bilibiliAudio } from '../../lib/bilibili'
 import { queues } from '../../lib/queue'
 import config from '../../config'
 import * as libAudio from '../../lib/audio'
+import url = require('url')
+import qs = require('qs')
+import { youtubeAudio } from '../../lib/youtube'
 
 const createAudio = (msg: Message): Option<Future.FutureInstance<{}, libAudio.Audio>> => {
   if (msg.content.includes('youtube')) {
     // TODO: implement youtube
-    return Option.empty()
+    const re = /add\s+(.*)/
+    const audio = Option.of(re.exec(msg.content.slice(config.prefix.length).trim()))
+    .flatMap((arr: string[]) => {
+      arr.shift()
+      return Option.of(arr.shift())
+    })
+    .map((str: string) => url.parse(str))
+    .flatMap(a => Option.of(a.query))
+    .map((q: string) => qs.parse(q))
+    .flatMap(o => Option.of(o && o.v))
+    .map((videoId: string) => youtubeAudio({ videoId }))
+    return audio
   }
   const re = /add\s+(?:av)?(\d+)/ // matches the aid
   const audio = Option.of(re.exec(msg.content.slice(config.prefix.length).trim()))
