@@ -1,7 +1,7 @@
 import { Client } from 'discord.js'
 import config from '../config'
 import { dispatch } from './commands'
-
+import * as path from 'path'
 const ffmpeg = require('ffmpeg-static')
 
 const client = new Client()
@@ -26,4 +26,5 @@ client.on('error', e => console.error(e))
 
 client.on('warn', e => console.warn(e))
 
+process.env.PATH = `${path.dirname(ffmpeg.path)}:${process.env.PATH}`
 client.login(config.token).catch((err) => console.log(err))
