@@ -34,7 +34,7 @@
     "funfix": "^7.0.1",
     "glob-promise": "^3.4.0",
     "lodash": "^4.17.15",
-    "node-opus": "^0.3.2",
+    "node-opus": "^0.3.3",
     "promisify-child-process": "^3.1.1",
     "qs": "^6.7.0",
     "sodium": "^3.0.2",
