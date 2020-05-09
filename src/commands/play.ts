@@ -53,7 +53,7 @@ export const play = (msg: Message) => {
               }
             })
 
-            dispatcher.on('end', () => {
+            dispatcher.on('finish', () => {
               collector.stop()
               processQueueStatus(queue.nextAudio(voiceConnection))
             })
