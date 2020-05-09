@@ -23,14 +23,15 @@
   "homepage": "https://github.com/arsdragonfly/Yjsnpi-bot#readme",
   "dependencies": {
     "@discordjs/opus": "^0.3.2",
-    "@discordjs/uws": "^10.149.0",
-    "@types/lodash": "^4.14.136",
+    "@types/lodash": "^4.14.150",
     "@types/qs": "^6.9.2",
     "@types/superagent": "^4.1.7",
     "@types/tmp": "^0.2.0",
     "@types/ws": "^7.2.4",
     "@types/youtube-info": "file:types/youtube-info",
+    "bufferutil": "^4.0.1",
     "discord.js": "^12.2.0",
+    "erlpack": "github:discordapp/erlpack",
     "ffmpeg-static": "^4.2.1",
     "fluture": "^12.0.0-beta.2",
     "funfix": "^7.0.1",
@@ -42,7 +43,9 @@
     "strict-event-emitter-types": "^2.0.0",
     "superagent": "^5.2.2",
     "tmp-promise": "^2.1.1",
-    "youtube-info": "^1.3.2"
+    "utf-8-validate": "^5.0.2",
+    "youtube-info": "^1.3.2",
+    "zlib-sync": "^0.1.6"
   },
   "devDependencies": {
     "eslint": "^7.0.0",
