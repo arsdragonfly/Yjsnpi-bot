@@ -74,7 +74,7 @@ export const add = (msg: Message) => {
   audio.fold(
     () => sendErrorMessage('Please enter a valid AV number or URL.'),
     (audio: Future.FutureInstance<{}, libAudio.Audio>) => {
-      Future.fork<{}, libAudio.Audio>(sendErrorMessage)(processAudio)(audio)
+      Future.fork<{}>(sendErrorMessage)(processAudio)(audio)
       return sendMessage('downloading metadata...')
     }
   ).catch()

@@ -8,7 +8,7 @@ import * as libAudio from './audio'
 export const downloadThumbnail = (referer: string) => (thumbnail: libAudio.Thumbnail.Thumbnail) => {
   const fail = () => thumbnail.eventEmitter().emit('fail')
   const success = (fullPath: string) => thumbnail.eventEmitter().emit('success', fullPath)
-  return Future.fork<string, string>(fail)(success)(
+  return Future.fork<string>(fail)(success)(
     Future.attemptP(() => {
       const status = thumbnail.status()
       switch (status.tag) {

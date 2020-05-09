@@ -52,9 +52,9 @@ const downloadMetadata = (aid: number) => Future.attemptP<string, BilibiliMetada
 export function bilibiliAudio (spec: BilibiliAudioSpec): Future.FutureInstance<{}, libAudio.Audio> {
   const { aid } = spec
   // This does look ugly; Deal with the typing and stuff later
-  const metadata = Future.both<string, BilibiliMetadata, string>(downloadMetadata(aid))(generatePath)
-  const metadataWithThumbnail = Future.both<string, [BilibiliMetadata, string], string>(metadata)(generatePath)
-  const bilibiliAudio = Future.map<string, [[BilibiliMetadata, string], string], libAudio.Audio>(
+  const metadata = Future.both<string, BilibiliMetadata>(downloadMetadata(aid))(generatePath)
+  const metadataWithThumbnail = Future.both<string, [BilibiliMetadata, string]>(metadata)(generatePath)
+  const bilibiliAudio = Future.map<[[BilibiliMetadata, string], string], libAudio.Audio>(
     ([[metadata, pendingPath], thumbnailPath]) => libAudio.audio({
       title: metadata.title,
       thumbnailUrl: metadata.thumbnailUrl,

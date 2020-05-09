@@ -78,7 +78,7 @@ export const play = (msg: Message) => {
       msg.reply(`Add some music to the queue first with ${config.prefix}add`).catch()
       break
     case 'ready':
-      Future.fork<string, VoiceConnection>(msg.reply.bind(msg))(
+      Future.fork<string>(msg.reply.bind(msg))(
         (voiceConnection: VoiceConnection) => playQueue(queue, voiceConnection)
       )(joinChannel)
       break
