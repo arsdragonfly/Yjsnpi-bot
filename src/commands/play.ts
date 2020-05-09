@@ -4,10 +4,10 @@ import { queues, Queue, QueueStatus } from '../../lib/queue'
 import config from '../../config'
 
 export const play = (msg: Message) => {
-  const queue = queues().getQueue(msg.guild.id)
+  const queue = queues().getQueue(msg.guild!.id)
 
   const joinChannel = Future.attemptP<string, VoiceConnection>(() => {
-    const { voiceChannel } = msg.member
+    const voiceChannel = msg.member?.voice.channel
     if (!voiceChannel || voiceChannel.type !== 'voice') {
       return Promise.reject('Please join a voice channel first.')
     }
@@ -28,9 +28,9 @@ export const play = (msg: Message) => {
             break
           case 'success':
             msg.reply(`Now playing ${audioStatus.title}.`).catch()
-            const dispatcher = msg.guild.voiceConnection.playFile(audioStatus.path)
+            const dispatcher = msg.guild!.voice!.connection!.play(audioStatus.path)
             console.log(audioStatus.path)
-            const collector = msg.channel.createCollector(m => m)
+            const collector = msg.channel.createMessageCollector(m => m)
             collector.on('collect', (m: Message) => {
               if (m.content.startsWith(`${config.prefix}`)) {
                 const option = m.content

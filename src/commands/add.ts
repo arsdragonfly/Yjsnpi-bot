@@ -1,4 +1,4 @@
-import { Message, RichEmbed } from 'discord.js'
+import { Message, MessageEmbed } from 'discord.js'
 import { Option } from 'funfix'
 import * as Future from 'fluture'
 import * as path from 'path'
@@ -39,7 +39,7 @@ const createAudio = (msg: Message): Option<Future.FutureInstance<{}, libAudio.Au
 }
 
 export const add = (msg: Message) => {
-  const queue = queues().getQueue(msg.guild.id)
+  const queue = queues().getQueue(msg.guild!.id)
   const sendMessage = msg.reply.bind(msg)
   const sendErrorMessage = (m: {}) => sendMessage(`Error: ${m}`)
 
@@ -49,7 +49,7 @@ export const add = (msg: Message) => {
     const thumbnail = audio.thumbnail()
     queue.addAudio(audio)
     audio.downloadAudio(audio)
-    const embed = new RichEmbed()
+    const embed = new MessageEmbed()
       .setColor('#00a5db')
       .setAuthor(msg.author.username)
       .setTitle(audio.status().title)
@@ -64,7 +64,7 @@ export const add = (msg: Message) => {
       const basename = path.basename(fullPath)
       msg.reply({
         embed: embed
-          .attachFile({ attachment: fullPath, name: basename })
+          .attachFiles([{ attachment: fullPath, name: basename }])
           .setThumbnail(`attachment://${basename}`)
       }).catch()
     })
