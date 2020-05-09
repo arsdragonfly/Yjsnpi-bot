@@ -1,4 +1,4 @@
-import { Message, RichEmbed } from 'discord.js'
+import { Message, MessageEmbed } from 'discord.js'
 import { Option } from 'funfix'
 import * as Future from 'fluture'
 import * as path from 'path'
@@ -12,7 +12,7 @@ import { youtubeAudio } from '../../lib/youtube'
 
 const createAudio = (msg: Message): Option<Future.FutureInstance<{}, libAudio.Audio>> => {
   if (msg.content.includes('youtube')) {
-    // TODO: implement youtube
+    // Youtube
     const re = /add\s+(.*)/
     const audio = Option.of(re.exec(msg.content.slice(config.prefix.length).trim()))
     .flatMap((arr: string[]) => {
@@ -23,9 +23,10 @@ const createAudio = (msg: Message): Option<Future.FutureInstance<{}, libAudio.Au
     .flatMap(a => Option.of(a.query))
     .map((q: string) => qs.parse(q))
     .flatMap(o => Option.of(o && o.v))
-    .map((videoId: string) => youtubeAudio({ videoId }))
+    .flatMap((videoId) => Option.of(youtubeAudio({ videoId: videoId as string })))
     return audio
   }
+  // Bilibili
   const re = /add\s+(?:av)?(\d+)/ // matches the aid
   const audio = Option.of(re.exec(msg.content.slice(config.prefix.length).trim()))
     .flatMap((arr: string[]) => {
@@ -38,7 +39,7 @@ const createAudio = (msg: Message): Option<Future.FutureInstance<{}, libAudio.Au
 }
 
 export const add = (msg: Message) => {
-  const queue = queues().getQueue(msg.guild.id)
+  const queue = queues().getQueue(msg.guild!.id)
   const sendMessage = msg.reply.bind(msg)
   const sendErrorMessage = (m: {}) => sendMessage(`Error: ${m}`)
 
@@ -48,7 +49,7 @@ export const add = (msg: Message) => {
     const thumbnail = audio.thumbnail()
     queue.addAudio(audio)
     audio.downloadAudio(audio)
-    const embed = new RichEmbed()
+    const embed = new MessageEmbed()
       .setColor('#00a5db')
       .setAuthor(msg.author.username)
       .setTitle(audio.status().title)
@@ -63,7 +64,7 @@ export const add = (msg: Message) => {
       const basename = path.basename(fullPath)
       msg.reply({
         embed: embed
-          .attachFile({ attachment: fullPath, name: basename })
+          .attachFiles([{ attachment: fullPath, name: basename }])
           .setThumbnail(`attachment://${basename}`)
       }).catch()
     })
@@ -73,7 +74,7 @@ export const add = (msg: Message) => {
   audio.fold(
     () => sendErrorMessage('Please enter a valid AV number or URL.'),
     (audio: Future.FutureInstance<{}, libAudio.Audio>) => {
-      Future.fork<{}, libAudio.Audio>(sendErrorMessage)(processAudio)(audio)
+      Future.fork<{}>(sendErrorMessage)(processAudio)(audio)
       return sendMessage('downloading metadata...')
     }
   ).catch()

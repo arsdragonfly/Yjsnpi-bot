@@ -27,9 +27,9 @@ const downloadMetadata = (videoId: string) => Future.attemptP<string, YoutubeMet
 
 export function youtubeAudio (spec: YoutubeAudioSpec): Future.FutureInstance<{}, libAudio.Audio> {
   const { videoId } = spec
-  const metadata = Future.both<string, YoutubeMetadata, string>(downloadMetadata(videoId))(generatePath)
-  const metadataWithThumbnail = Future.both<string, [YoutubeMetadata, string], string>(metadata)(generatePath)
-  const youtubeAudio = Future.map<string, [[YoutubeMetadata, string], string], libAudio.Audio>(
+  const metadata = Future.both<string, YoutubeMetadata>(downloadMetadata(videoId))(generatePath)
+  const metadataWithThumbnail = Future.both<string, [YoutubeMetadata, string]>(metadata)(generatePath)
+  const youtubeAudio = Future.map<[[YoutubeMetadata, string], string], libAudio.Audio>(
     ([[metadata, pendingPath], thumbnailPath]) => libAudio.audio({
       title: metadata.title,
       thumbnailUrl: metadata.thumbnailUrl,

@@ -158,7 +158,7 @@ const findFile = (path: string) => () => glob(`${path}.*`).then((arr: string[]) 
 ))
 
 // downloading audio via annie which will probably work for every platform
-export const downloadAudio = (audio: Audio) => Future.fork<string, string>(() => audio.eventEmitter().emit('fail'))((fullPath: string) => audio.eventEmitter().emit('success', fullPath))(
+export const downloadAudio = (audio: Audio) => Future.fork<string>(() => audio.eventEmitter().emit('fail'))((fullPath: string) => audio.eventEmitter().emit('success', fullPath))(
   Future.attemptP(() => {
     const status = audio.status()
     switch (status.tag) {
