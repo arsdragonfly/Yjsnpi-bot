@@ -12,7 +12,7 @@ import { youtubeAudio } from '../../lib/youtube'
 
 const createAudio = (msg: Message): Option<Future.FutureInstance<{}, libAudio.Audio>> => {
   if (msg.content.includes('youtube')) {
-    // TODO: implement youtube
+    // Youtube
     const re = /add\s+(.*)/
     const audio = Option.of(re.exec(msg.content.slice(config.prefix.length).trim()))
     .flatMap((arr: string[]) => {
@@ -23,9 +23,10 @@ const createAudio = (msg: Message): Option<Future.FutureInstance<{}, libAudio.Au
     .flatMap(a => Option.of(a.query))
     .map((q: string) => qs.parse(q))
     .flatMap(o => Option.of(o && o.v))
-    .map((videoId: string) => youtubeAudio({ videoId }))
+    .flatMap((videoId) => Option.of(youtubeAudio({ videoId: videoId as string })))
     return audio
   }
+  // Bilibili
   const re = /add\s+(?:av)?(\d+)/ // matches the aid
   const audio = Option.of(re.exec(msg.content.slice(config.prefix.length).trim()))
     .flatMap((arr: string[]) => {
