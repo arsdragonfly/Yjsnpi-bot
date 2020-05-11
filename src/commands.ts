@@ -1,3 +1,4 @@
+/*
 import { Message } from 'discord.js'
 import config from '../config'
 
@@ -50,3 +51,5 @@ export const dispatch: (msg: Message) => void = (msg) => {
     }
   }
 }
+
+*/

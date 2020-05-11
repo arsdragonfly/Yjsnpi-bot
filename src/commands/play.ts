@@ -1,3 +1,4 @@
+/*
 import { Message, VoiceConnection } from 'discord.js'
 import * as Future from 'fluture'
 import { queues, Queue, QueueStatus } from '../../lib/queue'
@@ -87,3 +88,5 @@ export const play = (msg: Message) => {
       break
   }
 }
+
+*/

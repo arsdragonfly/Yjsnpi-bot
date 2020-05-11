@@ -1,3 +1,4 @@
+/*
 import { Message, MessageEmbed } from 'discord.js'
 import { Option } from 'funfix'
 import * as Future from 'fluture'
@@ -79,3 +80,5 @@ export const add = (msg: Message) => {
     }
   ).catch()
 }
+
+*/

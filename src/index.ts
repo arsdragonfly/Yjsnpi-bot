@@ -13,12 +13,12 @@ const client = new Commando.CommandoClient({
 client.registry
   .registerDefaultTypes()
   .registerGroups([
-    ['first', 'Your First Command Group'],
-    ['second', 'Your Second Command Group']
+    ['general', 'general commands'],
+    ['playback', 'commands that control audio playback']
   ])
   .registerDefaultGroups()
   .registerDefaultCommands()
-  // .registerCommandsIn(path.join(__dirname, 'commands'))
+  .registerCommandsIn(path.join(__dirname, 'commands'))
 
 client.on('ready', () => {
   console.log('I am ready!')
