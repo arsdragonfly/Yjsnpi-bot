@@ -2,7 +2,7 @@
 
 ![example](example.png)
 
-This bot has absolutely no Inmu elements. (realistically)
+This bot has absolutely no Inmu elements. (legit)
 
 [Click here](https://discordbots.org/bot/479293634831843328) to add this bot to your server!
 
@@ -20,7 +20,7 @@ Then, install FFMpeg:
 $ apt install ffmpeg
 ```
 
-Then, install Annie for Bilibili access using 
+Then, install Annie for Bilibili/YouTube access using 
 
 ```bash
 $ go get github.com/iawia002/annie
