@@ -14,6 +14,8 @@ module.exports = class WhatsnewCommand extends Command {
     const whatsnew = [
       '```asciidoc',
       `
+= 2020-05-12 =
+* Fix Bilibili BV.
 = 2019-08-13 =
 * Support YouTube.
 = 2018-10-22 =
