@@ -15,7 +15,7 @@ export const downloadThumbnail = (referer: string) => (thumbnail: libAudio.Thumb
         case 'pending':
           const { pendingPath, thumbnailUrl } = status
           const extension = path.extname(new url.URL(thumbnailUrl).pathname)
-          const fullPath = `${pendingPath}.${extension}`
+          const fullPath = `${pendingPath}${extension}`
           const stream = fs.createWriteStream(fullPath)
           const req = request.get(thumbnailUrl).set({ Referer: referer })
           req.pipe(stream)
@@ -29,6 +29,7 @@ export const downloadThumbnail = (referer: string) => (thumbnail: libAudio.Thumb
           })
           return p
         default:
+          console.log('Internal error.')
           return Promise.reject('Internal error.')
       }
     })
