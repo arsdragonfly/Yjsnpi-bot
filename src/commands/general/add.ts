@@ -10,6 +10,7 @@ import * as libAudio from '../../../lib/audio'
 import url = require('url')
 import qs = require('qs')
 import { youtubeAudio } from '../../../lib/youtube'
+import { BVtoAV } from 'bilibili-bv-av-convert'
 
 module.exports = class AddCommand extends Command {
   constructor (client: CommandoClient) {
@@ -17,16 +18,23 @@ module.exports = class AddCommand extends Command {
       name: 'add',
       group: 'general',
       memberName: 'add',
-      description: 'add Bilibili/YouTube audio'
+      description: 'add Bilibili/YouTube audio',
+      args: [
+        {
+          key: 'vid',
+          prompt: 'Please enter the URL or AV/BV number',
+          type: 'string'
+        }
+      ]
     })
   }
 
-  run (msg: CommandoMessage) {
+  run (msg: CommandoMessage, { vid }: { vid: string }) {
     const queue = queues().getQueue(msg.guild.id)
     const sendMessage = msg.reply.bind(msg)
     const sendErrorMessage = (m: {}) => sendMessage(`Error: ${m}`)
 
-    const audio = this.createAudio(msg)
+    const audio = this.createAudio(vid)
 
     const processAudio = (audio: libAudio.Audio) => {
       const thumbnail = audio.thumbnail()
@@ -69,31 +77,39 @@ module.exports = class AddCommand extends Command {
     )
   }
 
-  createAudio (msg: CommandoMessage): Option<Future.FutureInstance<{}, libAudio.Audio>> {
-    if (msg.content.includes('youtube')) {
-      // Youtube
-      const re = /add\s+(.*)/
-      const audio = Option.of(re.exec(msg.content.slice(config.prefix.length).trim()))
-        .flatMap((arr: string[]) => {
-          arr.shift()
-          return Option.of(arr.shift())
-        })
-        .map((str: string) => url.parse(str))
+  createAudio (vid: string): Option<Future.FutureInstance<{}, libAudio.Audio>> {
+    if (vid.includes('youtube')) {
+      // Youtube URL
+      const audio = Option.of(url.parse(vid))
         .flatMap(a => Option.of(a.query))
         .map((q: string) => qs.parse(q))
         .flatMap(o => Option.of(o && o.v))
         .flatMap((videoId) => Option.of(youtubeAudio({ videoId: videoId as string })))
       return audio
+    } else if (!isNaN(Number(vid))) {
+      // Bilibili AV number without AV prefix
+      const aid = Number(vid)
+      return Option.of(bilibiliAudio({ aid }))
+    } else if (vid.includes('av')) {
+      const re = /(?:[aA][vV])(\d+)/ // matches the aid
+      const audio = Option.of(re.exec(vid))
+        .flatMap((arr: string[]) => {
+          arr.shift()
+          return Option.of(arr.shift())
+        })
+        .map((str: string) => Number(str))
+        .map((aid: number) => bilibiliAudio({ aid }))
+      return audio
+    } else {
+      const re = /([bB][vV]\w+)/ // matches the BV number
+      const audio = Option.of(re.exec(vid))
+        .flatMap((arr: string[]) => {
+          arr.shift()
+          return Option.of(arr.shift())
+        })
+        .map((str: string) => BVtoAV(str))
+        .map((aid: number) => bilibiliAudio({ aid }))
+      return audio
     }
-    // Bilibili
-    const re = /add\s+(?:av)?(\d+)/ // matches the aid
-    const audio = Option.of(re.exec(msg.content.slice(config.prefix.length).trim()))
-      .flatMap((arr: string[]) => {
-        arr.shift()
-        return Option.of(arr.shift())
-      })
-      .map((str: string) => Number(str))
-      .map((aid: number) => bilibiliAudio({ aid }))
-    return audio
   }
 }
