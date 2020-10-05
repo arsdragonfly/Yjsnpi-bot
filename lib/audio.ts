@@ -47,7 +47,7 @@ export namespace Thumbnail {
     readonly pendingPath: string
   }
 
-  export function thumbnail (spec: ThumbnailSpec): Thumbnail {
+  export function thumbnail(spec: ThumbnailSpec): Thumbnail {
     const { thumbnailUrl, pendingPath } = spec
     const ee: ThumbnailEventEmitter = new EventEmitter()
     let status: ThumbnailStatus = { tag: 'pending', thumbnailUrl, pendingPath }
@@ -115,7 +115,7 @@ export interface Audio {
   readonly downloadThumbnail: (thumbnail: Thumbnail.Thumbnail) => Future.Cancel
 }
 
-export function audio (spec: AudioSpec): Audio {
+export function audio(spec: AudioSpec): Audio {
   const {
     title, thumbnailUrl, thumbnailPath, pendingPath, url, desc
   } = spec
@@ -166,7 +166,7 @@ export const downloadAudio = (audio: Audio) => Future.fork<string>(() => audio.e
         const { pendingPath } = status
         return spawn(
           config.anniePath,
-          ['-o', path.dirname(pendingPath), '-O', path.basename(pendingPath), status.url, '-m'],
+          ['-m', '-o', path.dirname(pendingPath), '-O', path.basename(pendingPath), status.url],
           { stdio: 'inherit', shell: true }
         ).then(findFile(pendingPath), err => `failed to launch annie because of ${err}`)
       default:
