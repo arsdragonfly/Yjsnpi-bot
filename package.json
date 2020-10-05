@@ -23,6 +23,7 @@
   "homepage": "https://github.com/arsdragonfly/Yjsnpi-bot#readme",
   "dependencies": {
     "@discordjs/opus": "^0.3.2",
+    "@types/bilibili-bv-av-convert": "file:types/bilibili-bv-av-convert",
     "@types/ffmpeg-static": "^3.0.0",
     "@types/lodash": "^4.14.150",
     "@types/qs": "^6.9.2",
@@ -30,7 +31,6 @@
     "@types/tmp": "^0.2.0",
     "@types/ws": "^7.2.4",
     "@types/youtube-info": "file:types/youtube-info",
-    "@types/bilibili-bv-av-convert": "file:types/bilibili-bv-av-convert",
     "bilibili-bv-av-convert": "^1.0.0",
     "bufferutil": "^4.0.1",
     "discord.js": "^12.2.0",
@@ -40,6 +40,7 @@
     "fluture": "^12.2.0",
     "funfix": "^7.0.1",
     "glob-promise": "^3.4.0",
+    "googleapis": "^60.0.1",
     "lodash": "^4.17.15",
     "promisify-child-process": "^4.1.0",
     "qs": "^6.9.4",
@@ -48,7 +49,6 @@
     "superagent": "^5.2.2",
     "tmp-promise": "^2.1.1",
     "utf-8-validate": "^5.0.2",
-    "youtube-info": "^1.3.2",
     "zlib-sync": "^0.1.6"
   },
   "devDependencies": {

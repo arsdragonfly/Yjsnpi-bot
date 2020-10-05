@@ -4,6 +4,7 @@
 interface Config {
   readonly owner: string
   readonly token: string
+  readonly youtubeAPIKey: string
   readonly invite: string
   readonly prefix: string
   readonly anniePath: string
@@ -13,6 +14,7 @@ interface Config {
 const config: Config = {
   token: 'Replace this with a valid token.',
   owner: 'Replace this with your own Discord ID',
+  youtubeAPIKey: 'Replace this with an API key obtained here: https://console.developers.google.com/apis/dashboard',
   invite: 'https://discord.gg/DW4Trr2',
   prefix: '()',
   anniePath: '~/go/bin/annie',

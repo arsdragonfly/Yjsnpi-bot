@@ -166,7 +166,7 @@ export const downloadAudio = (audio: Audio) => Future.fork<string>(() => audio.e
         const { pendingPath } = status
         return spawn(
           config.anniePath,
-          ['-o', path.dirname(pendingPath), '-O', path.basename(pendingPath), status.url],
+          ['-o', path.dirname(pendingPath), '-O', path.basename(pendingPath), status.url, '-m'],
           { stdio: 'inherit', shell: true }
         ).then(findFile(pendingPath), err => `failed to launch annie because of ${err}`)
       default:
