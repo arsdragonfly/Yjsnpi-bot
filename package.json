@@ -41,7 +41,7 @@
     "funfix": "^7.0.1",
     "glob-promise": "^3.4.0",
     "googleapis": "^60.0.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "promisify-child-process": "^4.1.0",
     "qs": "^6.9.4",
     "sodium": "^3.0.2",
