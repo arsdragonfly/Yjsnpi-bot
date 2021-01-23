@@ -12,8 +12,8 @@ interface Config {
 }
 
 const config: Config = {
-  token: 'Replace this with a valid token.',
   owner: 'Replace this with your own Discord ID',
+  token: 'Replace this with a valid token.',
   youtubeAPIKey: 'Replace this with an API key obtained here: https://console.developers.google.com/apis/dashboard',
   invite: 'https://discord.gg/DW4Trr2',
   prefix: '()',

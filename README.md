@@ -34,7 +34,9 @@ Next, clone the directory and run
 $ npm install -g typescript
 ```
 
-After installing typescript, run
+After installing typescript, copy `config.example.ts` to `config.ts` and fill out configs accordingly.
+
+Finally, run
 
 ```bash
 $ npm install && npm run start
