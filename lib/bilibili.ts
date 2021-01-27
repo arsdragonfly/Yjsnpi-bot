@@ -15,15 +15,16 @@ interface BilibiliMetadata {
   readonly desc: string
 }
 
-const downloadMetadata = (aid: number) => Future.attemptP<string, BilibiliMetadata>(() => {
-  const errorHandler = (t: string | undefined) => {
-    if (t !== undefined) {
-      return String(t)
-    }
-    throw new Error('Failed to retrieve metadata.')
+const errorHandler = (t: string | undefined) => {
+  if (t !== undefined) {
+    return String(t)
   }
+  throw new Error('Failed to retrieve metadata.')
+}
+
+const downloadMetadata = (aid: number) => Future.attemptP<string, BilibiliMetadata>(() => {
   const promise = request
-    .get('https://hibiapi.herokuapp.com/api/bilibili/v2/')
+    .get('https://hibiapi.herokuapp.com/api/bilibili/v3/video_info')
     .query({ aid })
     .then(
       ((f, g, h) => (res: request.Response) => ({
@@ -49,7 +50,7 @@ const downloadMetadata = (aid: number) => Future.attemptP<string, BilibiliMetada
   return promise
 })
 
-export function bilibiliAudio (spec: BilibiliAudioSpec): Future.FutureInstance<{}, libAudio.Audio> {
+export function bilibiliAudio(spec: BilibiliAudioSpec): Future.FutureInstance<{}, libAudio.Audio> {
   const { aid } = spec
   // This does look ugly; Deal with the typing and stuff later
   const metadata = Future.both<string, BilibiliMetadata>(downloadMetadata(aid))(generatePath)
@@ -67,4 +68,8 @@ export function bilibiliAudio (spec: BilibiliAudioSpec): Future.FutureInstance<{
     })
   )(metadataWithThumbnail)
   return bilibiliAudio
+}
+
+export function bilibiliSearch(query: string, limit: number): Future.FutureInstance<{}, Future.FutureInstance<{}, libAudio.Audio>[]> {
+  return Future.resolve([])
 }
