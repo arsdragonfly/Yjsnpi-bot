@@ -23,7 +23,7 @@ const downloadMetadata = (aid: number) => Future.attemptP<string, BilibiliMetada
     throw new Error('Failed to retrieve metadata.')
   }
   const promise = request
-    .get('https://hibiapi.herokuapp.com/api/bilibili/v2/')
+    .get('https://api.obfs.dev/api/bilibili/v3/video_info')
     .query({ aid })
     .then(
       ((f, g, h) => (res: request.Response) => ({
