@@ -1,44 +1,25 @@
-import * as Commando from 'discord.js-commando'
+import { SapphireClient } from '@sapphire/framework'
 import config from '../config'
 // import { dispatch } from './commands'
 import * as path from 'path'
 import ffmpeg = require('ffmpeg-static')
 
-const client = new Commando.CommandoClient({
-  owner: config.owner,
-  commandPrefix: config.prefix,
-  invite: config.invite
-})
-
-client.registry
-  .registerDefaultTypes()
-  .registerGroups([
-    ['general', 'general commands'],
-    ['playback', 'commands that control audio playback']
-  ])
-  .registerDefaultGroups()
-  .registerDefaultCommands()
-  .registerCommandsIn(path.join(__dirname, 'commands'))
+const client = new SapphireClient({
+  intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_VOICE_STATES'],
+  defaultPrefix: config.prefix,
+  loadMessageCommandListeners: true,
+});
 
 client.on('ready', () => {
   console.log('I am ready!')
   console.log(ffmpeg)
   client
     .user!.setPresence({
-      activity: {
+      activities: [{
         name: `Ikisugi! | ${config.prefix}help`
-      }
+      }]
     })
-    .catch()
 })
-
-/*
-client.on('message', (msg) => {
-  if (msg.content.startsWith(config.prefix)) {
-    dispatch(msg)
-  }
-})
-*/
 
 client.on('error', (e) => console.error(e))
 

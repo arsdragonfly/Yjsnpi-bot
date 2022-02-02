@@ -1,39 +1,36 @@
-import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando'
-import { MessageEmbed } from 'discord.js'
+import { Command, Args } from '@sapphire/framework'
+import { Message, MessageEmbed } from 'discord.js'
 import { Option } from 'funfix'
 import * as Future from 'fluture'
 import * as path from 'path'
-import { bilibiliAudio } from '../../../lib/bilibili'
-import { queues } from '../../../lib/queue'
-import config from '../../../config'
-import * as libAudio from '../../../lib/audio'
+import { bilibiliAudio } from '../../lib/bilibili'
+import { queues } from '../../lib/queue'
+import config from '../../config'
+import * as libAudio from '../../lib/audio'
 import url = require('url')
 import qs = require('qs')
-import { youtubeAudio } from '../../../lib/youtube'
+import { youtubeAudio } from '../../lib/youtube'
 import { BVtoAV } from 'bilibili-bv-av-convert'
 
-module.exports = class AddCommand extends Command {
-  constructor (client: CommandoClient) {
-    super(client, {
+export class AddCommand extends Command {
+  public constructor (context: Command.Context, options: Command.Options) {
+    super(context, {
+      ...options,
       name: 'add',
-      group: 'general',
-      memberName: 'add',
       description: 'add Bilibili/YouTube audio',
-      args: [
-        {
-          key: 'vid',
-          prompt: 'Please enter the URL or AV/BV number',
-          type: 'string'
-        }
-      ]
     })
   }
 
-  run (msg: CommandoMessage, { vid }: { vid: string }) {
-    const queue = queues().getQueue(msg.guild.id)
+  public async messageRun(msg: Message, args: Args) {
+    const guildId = msg.guildId
     const sendMessage = msg.reply.bind(msg)
     const sendErrorMessage = (m: {}) => sendMessage(`Error: ${m}`)
+    if (guildId == null) {
+      return sendErrorMessage("Message me in a discord server to add audio.").catch()
+    }
 
+    const vid = await args.rest('string')
+    const queue = queues().getQueue(guildId)
     const audio = this.createAudio(vid)
 
     const processAudio = (audio: libAudio.Audio) => {
@@ -42,7 +39,6 @@ module.exports = class AddCommand extends Command {
       audio.downloadAudio(audio)
       const embed = new MessageEmbed()
         .setColor('#00a5db')
-        .setAuthor(msg.author.username)
         .setTitle(audio.status().title)
         .setURL(audio.status().url)
         .setDescription(audio.status().desc)
@@ -51,15 +47,15 @@ module.exports = class AddCommand extends Command {
           `${config.prefix}queue shows current queue; Kick off with ${config.prefix}play!`
         )
       thumbnail.eventEmitter().on('fail', () => {
-        return msg.replyEmbed(embed)
+        return msg.reply({embeds: [embed]})
       })
       thumbnail.eventEmitter().on('success', (fullPath: string) => {
         console.log(fullPath)
         const basename = path.basename(fullPath)
-        msg.replyEmbed(embed
-          .attachFiles([{ attachment: fullPath, name: basename }])
-          .setThumbnail(`attachment://${basename}`)
-        ).catch()
+        msg.reply({
+          embeds: [embed.setThumbnail(`attachment://${basename}`)],
+          files:[{ attachment: fullPath, name: basename }]
+        }).catch()
       })
       audio.downloadThumbnail(thumbnail)
     }

@@ -4,7 +4,7 @@ import * as Future from 'fluture'
 import config from '../config'
 import { spawn } from 'promisify-child-process'
 import * as path from 'path'
-import * as glob from 'glob-promise'
+import glob from 'glob-promise'
 
 interface Events {
   fail: () => void

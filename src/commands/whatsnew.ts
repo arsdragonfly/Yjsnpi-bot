@@ -1,16 +1,16 @@
-import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando'
+import { Command } from '@sapphire/framework'
+import type { Message } from 'discord.js'
 
-module.exports = class WhatsnewCommand extends Command {
-  constructor (client: CommandoClient) {
-    super(client, {
+export class WhatsnewCommand extends Command {
+  public constructor (context: Command.Context, options: Command.Options) {
+    super(context, {
+      ...options,
       name: 'whatsnew',
-      group: 'general',
-      memberName: 'whatsnew',
       description: 'see the bot\'s recent updates'
     })
   }
 
-  async run (message: CommandoMessage) {
+  public async messageRun (message: Message) {
     const whatsnew = [
       '```asciidoc',
       `

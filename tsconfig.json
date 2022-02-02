@@ -2,6 +2,11 @@
     "compilerOptions": {
         "module": "commonjs",
         "target": "es6",
-        "strict": true
+        "strict": true,
+        "types": [
+            "node"
+        ],
+        "esModuleInterop": true,
+        "sourceMap": true,
     }
 }

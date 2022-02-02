@@ -1,28 +1,36 @@
-import { Command, CommandoClient, CommandoMessage } from 'discord.js-commando'
-import { VoiceConnection } from 'discord.js'
+import { Command } from '@sapphire/framework'
+import { AudioPlayerStatus, createAudioPlayer, createAudioResource, getVoiceConnection, joinVoiceChannel, VoiceConnection } from '@discordjs/voice'
 import * as Future from 'fluture'
-import { queues, Queue, QueueStatus } from '../../../lib/queue'
-import config from '../../../config'
+import { queues, Queue, QueueStatus } from '../../lib/queue'
+import config from '../../config'
+import { Message } from 'discord.js'
 
-module.exports = class PlayCommand extends Command {
-  constructor (client: CommandoClient) {
-    super(client, {
+export class PlayCommand extends Command {
+  public constructor(context: Command.Context, options: Command.Options) {
+    super(context, {
+      ...options,
       name: 'play',
-      group: 'general',
-      memberName: 'play',
       description: 'start playing audio in the queue'
     })
   }
 
-  run (msg: CommandoMessage) {
-    const queue = queues().getQueue(msg.guild.id)
+  public async messageRun(msg: Message) {
+    const guildId = msg.guildId
+    if (guildId == null) {
+      return msg.reply("Message me in a discord server to play the current queue.").catch()
+    }
+    const queue = queues().getQueue(guildId)
 
-    const joinChannel = Future.attemptP<string, VoiceConnection>(() => {
+    const joinChannel = Future.attemptP<string, VoiceConnection>(async () => {
       const voiceChannel = msg.member?.voice.channel
-      if (!voiceChannel || voiceChannel.type !== 'voice') {
+      if (voiceChannel == null) {
         return Promise.reject('Please join a voice channel first.')
       }
-      return voiceChannel.join()
+      return joinVoiceChannel({
+        channelId: voiceChannel.id,
+        guildId: voiceChannel.guildId,
+        adapterCreator: voiceChannel.guild.voiceAdapterCreator
+      })
     })
 
     const playQueue = (queue: Queue, voiceConnection: VoiceConnection) => {
@@ -39,10 +47,14 @@ module.exports = class PlayCommand extends Command {
               break
             case 'success':
               msg.reply(`Now playing ${audioStatus.title}.`).catch()
-              const dispatcher = msg.guild.voice!.connection!.play(audioStatus.path)
+              const player = createAudioPlayer();
+              const resource = createAudioResource(audioStatus.path)
+              const connection = getVoiceConnection(guildId)
+              connection?.subscribe(player)
+              player.play(resource)
               console.log(audioStatus.path)
-              const collector = msg.channel.createMessageCollector(m => m)
-              collector.on('collect', (m: CommandoMessage) => {
+              const collector = msg.channel.createMessageCollector()
+              collector.on('collect', (m: Message) => {
                 if (m.content.startsWith(`${config.prefix}`)) {
                   const option = m.content
                     .slice(config.prefix.length)
@@ -51,26 +63,26 @@ module.exports = class PlayCommand extends Command {
                     .shift()
                   if (option === 'pause') {
                     msg.channel.send(`Paused ${audioStatus.title}.`).catch()
-                    dispatcher.pause()
+                    player.pause()
                     queue.pause()
-                  } else if (option === 'resume') {
+                  } else if (option === 'resume' || option === 'unpause') {
                     msg.channel.send(`Resumed ${audioStatus.title}.`).catch()
-                    dispatcher.resume()
+                    player.unpause()
                     queue.resume()
                   } else if (option === 'skip') {
                     msg.channel.send(`Skipped ${audioStatus.title}.`).catch()
-                    dispatcher.end()
+                    player.stop()
                   }
                 }
               })
 
-              dispatcher.on('finish', () => {
+              player.on('error', (err) => {
+                msg.reply(`Error: ${err}`).catch()
                 collector.stop()
                 processQueueStatus(queue.nextAudio(voiceConnection))
               })
 
-              dispatcher.on('error', (err) => {
-                msg.reply(`Error: ${err}`).catch()
+              player.on(AudioPlayerStatus.Idle, () => {
                 collector.stop()
                 processQueueStatus(queue.nextAudio(voiceConnection))
               })

@@ -1,4 +1,4 @@
-import { VoiceConnection } from 'discord.js'
+import { VoiceConnection } from '@discordjs/voice'
 import * as audio from './audio'
 import config from '../config'
 

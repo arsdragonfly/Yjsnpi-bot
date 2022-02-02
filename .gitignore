@@ -78,5 +78,6 @@ typings/
 # Bot token config, etc.
 config.ts
 
-# compiled js
+# compiled js and sourcemap
 **/*.js
+**/*.js.map
