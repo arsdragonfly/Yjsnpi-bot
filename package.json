@@ -37,7 +37,6 @@
     "bilibili-bv-av-convert": "^1.0.0",
     "bufferutil": "^4.0.1",
     "discord.js": "^13.6.0",
-    "erlpack": "github:discordapp/erlpack",
     "ffmpeg-static": "^4.4.1",
     "fluture": "^12.2.0",
     "funfix": "^7.0.1",
