@@ -22,7 +22,7 @@
   },
   "homepage": "https://github.com/arsdragonfly/Yjsnpi-bot#readme",
   "dependencies": {
-    "@discordjs/opus": "^0.7.0",
+    "@discordjs/opus": "^0.8.0",
     "@discordjs/voice": "^0.8.0",
     "@sapphire/framework": "^3.0.0-next.168769c.0",
     "@types/bilibili-bv-av-convert": "file:types/bilibili-bv-av-convert",
