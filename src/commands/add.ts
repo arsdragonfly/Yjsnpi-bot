@@ -31,7 +31,7 @@ export class AddCommand extends Command {
             .setName('url')
             .setDescription('Bilibili/YouTube URL, or AV/BV number for Bilibili')
             .setRequired(true)),
-      {idHints: ['1013338292374208563']})
+      {idHints: ['1013338292374208563', '1013349598321979402']})
   }
 
   public async chatInputRun(interaction: Command.ChatInputInteraction) {

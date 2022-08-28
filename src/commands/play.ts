@@ -18,7 +18,7 @@ export class PlayCommand extends Command {
       builder
         .setName(this.name)
         .setDescription(this.description),
-      { idHints: ['1013338295167631380'] })
+      { idHints: ['1013338295167631380', '1013349684024197160'] })
   }
 
   public async chatInputRun(interaction: Command.ChatInputInteraction) {

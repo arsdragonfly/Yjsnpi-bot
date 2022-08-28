@@ -1,5 +1,4 @@
 import { Command } from '@sapphire/framework'
-import config from '../../config'
 
 export class PingCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -15,13 +14,13 @@ export class PingCommand extends Command {
       builder
         .setName(this.name)
         .setDescription(this.description),
-      {idHints: ['1013338296648224818']}
+      {idHints: ['1013338296648224818', '1013349602507903046']}
     )
   }
 
   public async chatInputRun(interaction: Command.ChatInputInteraction) {
     const commands = this.container.stores.get('commands')
-    const descriptions = commands.map((value, name) => `${config.prefix}${name}: ${value.description}`)
+    const descriptions = commands.map((value, name) => `/${name}: ${value.description}`)
     return interaction.reply(descriptions.join('\n'))
   }
 }

@@ -14,7 +14,7 @@ export class WhatsnewCommand extends Command {
       builder
         .setName(this.name)
         .setDescription(this.description),
-      {idHints: ['1013338293766729748']})
+      {idHints: ['1013338293766729748', '1013349599609626714']})
   }
 
   public async chatInputRun (interaction: Command.ChatInputInteraction) {

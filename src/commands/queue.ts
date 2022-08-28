@@ -15,7 +15,7 @@ export class QueueCommand extends Command {
       builder
         .setName(this.name)
         .setDescription(this.description),
-      {idHints: ['1013338298401427507']})
+      {idHints: ['1013338298401427507', '1013349601077628958']})
   }
 
   public async chatInputRun(interaction: Command.ChatInputInteraction) {

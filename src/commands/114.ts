@@ -15,7 +15,7 @@ export class PingCommand extends Command {
     builder
       .setName(this.name)
       .setDescription(this.description),
-      {idHints: ['1013325685454028900']})
+      {idHints: ['1013325685454028900', '1013349596841398272']})
   }
 
   public async chatInputRun(interaction: ChatInputCommand.Interaction) {
