@@ -5,11 +5,17 @@ export class PingCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
+      name: '114',
+      description: '114514',
     })
   }
 
   public override registerApplicationCommands(registry: ChatInputCommand.Registry) {
-    registry.registerChatInputCommand((builder) => builder.setName('114').setDescription('114514'), {idHints: ['1013325685454028900']})
+    registry.registerChatInputCommand((builder) =>
+    builder
+      .setName(this.name)
+      .setDescription(this.description),
+      {idHints: ['1013325685454028900']})
   }
 
   public async chatInputRun(interaction: ChatInputCommand.Interaction) {

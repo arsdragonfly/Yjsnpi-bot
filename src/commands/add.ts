@@ -16,20 +16,33 @@ export class AddCommand extends Command {
   public constructor (context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
-      name: 'add',
+      name: 'yjadd',
       description: 'add Bilibili/YouTube audio',
     })
   }
 
-  public async messageRun(msg: Message, args: Args) {
-    const guildId = msg.guildId
-    const sendMessage = msg.reply.bind(msg)
+  public override registerApplicationCommands(registry: Command.Registry) {
+    registry.registerChatInputCommand((builder) =>
+      builder
+        .setName(this.name)
+        .setDescription(this.description)
+        .addStringOption((option) => 
+          option
+            .setName('url')
+            .setDescription('Bilibili/YouTube URL, or AV/BV number for Bilibili')
+            .setRequired(true)),
+      {idHints: ['1013338292374208563']})
+  }
+
+  public async chatInputRun(interaction: Command.ChatInputInteraction) {
+    await interaction.reply("Adding audio...")
+    const guildId = interaction.guildId
+    const sendMessage = interaction.editReply.bind(interaction)
     const sendErrorMessage = (m: {}) => sendMessage(`Error: ${m}`)
     if (guildId == null) {
-      return sendErrorMessage("Message me in a discord server to add audio.").catch()
+      return await sendErrorMessage("Message me in a discord server to add audio.")
     }
-
-    const vid = await args.rest('string')
+    const vid = interaction.options.getString('url', true)
     const queue = queues().getQueue(guildId)
     const audio = this.createAudio(vid)
 
@@ -47,28 +60,26 @@ export class AddCommand extends Command {
           `${config.prefix}queue shows current queue; Kick off with ${config.prefix}play!`
         )
       thumbnail.eventEmitter().on('fail', () => {
-        return msg.reply({embeds: [embed]})
+        sendMessage({embeds: [embed]})
       })
       thumbnail.eventEmitter().on('success', (fullPath: string) => {
         console.log(fullPath)
         const basename = path.basename(fullPath)
-        msg.reply({
+        sendMessage({
           embeds: [embed.setThumbnail(`attachment://${basename}`)],
           files:[{ attachment: fullPath, name: basename }]
-        }).catch()
+        })
       })
       audio.downloadThumbnail(thumbnail)
     }
 
-    return audio.fold(
+    return await audio.fold(
       () => {
-        sendErrorMessage('Please enter a valid AV number or URL.').catch()
-        return null
+        return sendErrorMessage('Please enter a valid AV number or URL.')
       },
       (audio: Future.FutureInstance<{}, libAudio.Audio>) => {
         Future.fork<{}>(sendErrorMessage)(processAudio)(audio)
-        sendMessage('Downloading metadata').catch()
-        return null
+        return sendMessage('Downloading metadata')
       }
     )
   }
