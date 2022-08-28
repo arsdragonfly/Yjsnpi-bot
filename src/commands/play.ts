@@ -1,5 +1,5 @@
 import { Command } from '@sapphire/framework'
-import { AudioPlayerStatus, createAudioPlayer, createAudioResource, getVoiceConnection, joinVoiceChannel, VoiceConnection } from '@discordjs/voice'
+import { AudioPlayerStatus, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, getVoiceConnection, joinVoiceChannel, VoiceConnection } from '@discordjs/voice'
 import * as Future from 'fluture'
 import { queues, Queue, QueueStatus } from '../../lib/queue'
 import config from '../../config'
@@ -29,7 +29,7 @@ export class PlayCommand extends Command {
       return joinVoiceChannel({
         channelId: voiceChannel.id,
         guildId: voiceChannel.guildId,
-        adapterCreator: voiceChannel.guild.voiceAdapterCreator
+        adapterCreator: voiceChannel.guild.voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator
       })
     })
 
