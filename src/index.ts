@@ -16,7 +16,7 @@ client.on('ready', () => {
   client
     .user!.setPresence({
       activities: [{
-        name: `Ikisugi! | ${config.prefix}help`
+        name: `/yjhelp for help`,
       }]
     })
 })
