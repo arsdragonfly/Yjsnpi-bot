@@ -18,7 +18,7 @@ const config: Config = {
   invite: 'https://discord.gg/DW4Trr2',
   prefix: '()',
   anniePath: '~/go/bin/annie',
-  voiceConnectionTimeout: 300000
-}
+  voiceConnectionTimeout: 300000,
+};
 
-export default config
+export default config;

@@ -10,16 +10,15 @@ export interface Session {
 
 export const createSession = (): Session => {
   let voiceConnection: VoiceConnection | null = null;
+  const player = createAudioPlayer();
   const audioPlayer = async (audio: audio.Audio) => {
     const audioPath = await audio.audioPath;
-    const player = createAudioPlayer();
     const resource = createAudioResource(audioPath);
     if (voiceConnection == null) {
       throw new Error(`I'm kicked out of the channel.`);
     }
-    voiceConnection.subscribe(player);
     player.play(resource);
-    return new Promise<void>((resolve, reject) => {
+    return await new Promise<void>((resolve, reject) => {
       player.on('error', (err) => {
         reject(err);
       });
@@ -32,6 +31,7 @@ export const createSession = (): Session => {
   q.pause(); // by default the queue is paused until we attach a VoiceConnection
   const attachVoiceConnection = (vc: VoiceConnection) => {
     voiceConnection = vc;
+    voiceConnection.subscribe(player);
     q.resume();
   };
   const addAudio = (audio: audio.Audio) => {

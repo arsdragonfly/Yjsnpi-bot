@@ -13,15 +13,21 @@ interface BilibiliMetadata {
 }
 
 const downloadMetadata = async (aid: number): Promise<BilibiliMetadata> => {
-  const response = await request
-      .get('https://api.obfs.dev/api/bilibili/v3/video_info')
-      .query({aid});
   try {
-    return {
-      title: response.body.data.title,
-      thumbnailUrl: response.body.data.pic,
-      desc: response.body.data.desc,
-    };
+    const response = await request
+        .get('https://api.obfs.dev/api/bilibili/v3/video_info')
+        .query({aid});
+    if (response?.body?.data?.title != null &&
+        response?.body?.data?.pic != null &&
+        response?.body?.data?.desc != null) {
+      return {
+        title: response.body.data.title,
+        thumbnailUrl: response.body.data.pic,
+        desc: response.body.data.desc,
+      };
+    } else {
+      throw new Error('Invalid response');
+    }
   } catch {
     throw new Error('Failed to retrieve metadata.');
   }

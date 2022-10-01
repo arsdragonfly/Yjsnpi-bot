@@ -27,7 +27,6 @@
     "@sapphire/framework": "^3.0.0",
     "@types/bilibili-bv-av-convert": "file:types/bilibili-bv-av-convert",
     "@types/ffmpeg-static": "^3.0.0",
-    "@types/node": "^17.0.14",
     "@types/qs": "^6.9.2",
     "@types/superagent": "^4.1.7",
     "@types/tmp": "^0.2.0",
@@ -46,6 +45,7 @@
   },
   "devDependencies": {
     "@types/async": "^3.2.15",
+    "@types/node": "^18.7.23",
     "@typescript-eslint/eslint-plugin": "^5.38.1",
     "@typescript-eslint/parser": "^5.38.1",
     "eslint": "^8.24.0",

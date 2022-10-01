@@ -5,8 +5,8 @@ import {bilibiliAudio} from '../../lib/bilibili';
 import {sessions} from '../../lib/session';
 import config from '../../config';
 import * as libAudio from '../../lib/audio';
-import url = require('url')
-import qs = require('qs')
+import url from 'url';
+import qs from 'qs';
 import {youtubeAudio} from '../../lib/youtube';
 import {BVtoAV} from 'bilibili-bv-av-convert';
 

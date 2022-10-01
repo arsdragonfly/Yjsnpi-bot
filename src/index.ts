@@ -2,7 +2,7 @@ import {SapphireClient} from '@sapphire/framework';
 import config from '../config';
 // import { dispatch } from './commands'
 import * as path from 'path';
-import ffmpeg = require('ffmpeg-static')
+import ffmpeg from 'ffmpeg-static';
 
 const client = new SapphireClient({
   intents: ['GUILDS', 'GUILD_MESSAGES', 'GUILD_VOICE_STATES'],
