@@ -1,9 +1,7 @@
-import * as Future from 'fluture'
-import { google } from 'googleapis'
-import * as libAudio from './audio'
-import { generatePath } from './path'
-import { downloadThumbnail } from './thumbnail'
-import config from '../config'
+import {google} from 'googleapis';
+import {Audio, downloadAudio} from './audio';
+import {downloadThumbnail} from './thumbnail';
+import config from '../config';
 
 export interface YoutubeAudioSpec {
   readonly videoId: string
@@ -15,37 +13,29 @@ export interface YoutubeMetadata {
   readonly desc: string
 }
 
-const downloadMetadata = (videoId: string) => Future.attemptP<string, YoutubeMetadata>(() => {
-  const youtube = google.youtube({ version: 'v3', auth: config.youtubeAPIKey })
-  const promise = youtube.videos.list({ part: ['snippet'], id: [videoId] }).then(res => {
-    if (res.data.items) {
-      return {
-        title: res.data.items[0].snippet?.title || '',
-        thumbnailUrl: res.data.items[0].snippet?.thumbnails?.default?.url || '',
-        desc: res.data.items[0].snippet?.description || ''
-      }
-    } else {
-      return Promise.reject('failed to retrieve metadata.')
-    }
-  }, () => Promise.reject('Failed to retrieve metadata.'))
-  return promise
-})
+const downloadMetadata = async (videoId: string): Promise<YoutubeMetadata> => {
+  const youtube = google.youtube({version: 'v3', auth: config.youtubeAPIKey});
+  const res = await youtube.videos.list({part: ['snippet'], id: [videoId]});
+  if (res.data.items) {
+    return {
+      title: res.data.items[0].snippet?.title || '',
+      thumbnailUrl: res.data.items[0].snippet?.thumbnails?.default?.url || '',
+      desc: res.data.items[0].snippet?.description || '',
+    };
+  } else {
+    throw new Error('failed to retrieve metadata.');
+  }
+};
 
-export function youtubeAudio(spec: YoutubeAudioSpec): Future.FutureInstance<{}, libAudio.Audio> {
-  const { videoId } = spec
-  const metadata = Future.both<string, YoutubeMetadata>(downloadMetadata(videoId))(generatePath)
-  const metadataWithThumbnail = Future.both<string, [YoutubeMetadata, string]>(metadata)(generatePath)
-  const youtubeAudio = Future.map<[[YoutubeMetadata, string], string], libAudio.Audio>(
-    ([[metadata, pendingPath], thumbnailPath]) => libAudio.audio({
-      title: metadata.title,
-      thumbnailUrl: metadata.thumbnailUrl,
-      thumbnailPath,
-      pendingPath,
-      url: `https://www.youtube.com/watch?v=${videoId}`,
-      desc: metadata.desc,
-      downloadAudio: libAudio.downloadAudio,
-      downloadThumbnail: downloadThumbnail('https://www.youtube.com/')
-    })
-  )(metadataWithThumbnail)
-  return youtubeAudio
-}
+export const youtubeAudio = async (spec: YoutubeAudioSpec): Promise<Audio> => {
+  const {videoId} = spec;
+  const metadata = await downloadMetadata(videoId);
+  const url = `https://www.youtube.com/watch?v=${videoId}`;
+  return {
+    url,
+    title: metadata.title,
+    desc: metadata.desc,
+    thumbnailPath: downloadThumbnail('https://www.youtube.com/')(metadata.thumbnailUrl),
+    audioPath: downloadAudio(url),
+  };
+};

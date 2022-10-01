@@ -1,7 +1,7 @@
-import { SapphireClient } from '@sapphire/framework'
-import config from '../config'
+import {SapphireClient} from '@sapphire/framework';
+import config from '../config';
 // import { dispatch } from './commands'
-import * as path from 'path'
+import * as path from 'path';
 import ffmpeg = require('ffmpeg-static')
 
 const client = new SapphireClient({
@@ -11,19 +11,19 @@ const client = new SapphireClient({
 });
 
 client.on('ready', () => {
-  console.log('I am ready!')
-  console.log(ffmpeg)
+  console.log('I am ready!');
+  console.log(ffmpeg);
   client
-    .user!.setPresence({
-      activities: [{
-        name: `/yjhelp for help`,
-      }]
-    })
-})
+      .user?.setPresence({
+        activities: [{
+          name: `/yjhelp for help`,
+        }],
+      });
+});
 
-client.on('error', (e) => console.error(e))
+client.on('error', (e) => console.error(e));
 
-client.on('warn', (e) => console.warn(e))
+client.on('warn', (e) => console.warn(e));
 
-process.env.PATH = `${path.dirname(ffmpeg)}:${process.env.PATH}`
-client.login(config.token).catch((err) => console.log(err))
+process.env.PATH = `${path.dirname(ffmpeg)}:${process.env.PATH}`;
+client.login(config.token).catch((err) => console.log(err));

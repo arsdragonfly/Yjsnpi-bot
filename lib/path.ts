@@ -1,6 +1,5 @@
-import { tmpName } from 'tmp-promise'
-import * as Future from 'fluture'
+import {tmpName} from 'tmp-promise';
 
-export const generatePath = Future.attemptP<string, string>(() => tmpName({ template: '/tmp/tmp-XXXXXX' }).then(
-  (str: string) => (str && Promise.resolve(str)) || Promise.reject('Failed to generate path')
-))
+export const generatePath = async () : Promise<string> => {
+  return await tmpName({template: '/tmp/tmp-XXXXXX'});
+};

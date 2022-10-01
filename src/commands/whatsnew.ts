@@ -1,23 +1,23 @@
-import { Command } from '@sapphire/framework'
+import {Command} from '@sapphire/framework';
 
 export class WhatsnewCommand extends Command {
-  public constructor (context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
       name: 'yjwhatsnew',
-      description: 'see the bot\'s recent updates'
-    })
+      description: 'see the bot\'s recent updates',
+    });
   }
 
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand((builder) =>
       builder
-        .setName(this.name)
-        .setDescription(this.description),
-      {idHints: ['1013338293766729748', '1013349599609626714']})
+          .setName(this.name)
+          .setDescription(this.description),
+    {idHints: ['1013338293766729748', '1013349599609626714']});
   }
 
-  public async chatInputRun (interaction: Command.ChatInputInteraction) {
+  public async chatInputRun(interaction: Command.ChatInputInteraction) {
     const whatsnew = [
       '```asciidoc',
       `
@@ -33,8 +33,8 @@ export class WhatsnewCommand extends Command {
 * Supports displaying video thumbnail.
 * Misc. improvements.
 `,
-      '```'
-    ].join('\n')
-    return interaction.reply(whatsnew)
+      '```',
+    ].join('\n');
+    return interaction.reply(whatsnew);
   }
 }

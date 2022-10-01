@@ -1,3 +1,14 @@
 {
-    "extends": "airbnb-base"
+    "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "google"],
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["@typescript-eslint"],
+    "root": true,
+    "ignorePatterns": [
+        "**/*.js",
+        "**/*.js.map"
+    ],
+    "rules": {
+        "require-jsdoc": "off",
+        "max-len": "off"
+    }
 }
