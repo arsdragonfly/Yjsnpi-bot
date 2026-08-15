@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "description": "Stinking Discord bot.",
   "main": "src/index.js",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
     "start": "tsc && node src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -22,9 +25,7 @@
   },
   "homepage": "https://github.com/arsdragonfly/Yjsnpi-bot#readme",
   "dependencies": {
-    "@discordjs/opus": "^0.8.0",
     "@discordjs/voice": "^0.11.0",
-    "discord-api-types": "^0.33.5",
     "@sapphire/framework": "^3.0.0",
     "@types/bilibili-bv-av-convert": "file:types/bilibili-bv-av-convert",
     "@types/ffmpeg-static": "^3.0.0",
@@ -37,21 +38,21 @@
     "@types/youtube-info": "file:types/youtube-info",
     "bilibili-bv-av-convert": "^1.0.0",
     "bufferutil": "^4.0.1",
+    "discord-api-types": "^0.33.5",
     "discord.js": "^13.10.3",
     "ffmpeg-static": "^4.4.1",
     "fluture": "^12.2.0",
     "funfix": "^7.0.1",
     "glob-promise": "^3.4.0",
-    "googleapis": "^60.0.1",
     "lodash": "^4.17.20",
+    "opusscript": "^0.0.8",
     "promisify-child-process": "^4.1.0",
     "qs": "^6.9.4",
     "sodium": "^3.0.2",
     "strict-event-emitter-types": "^2.0.0",
     "superagent": "^5.2.2",
-    "tmp-promise": "^2.1.1",
-    "utf-8-validate": "^5.0.2",
-    "zlib-sync": "^0.1.6"
+    "tmp-promise": "^3.0.3",
+    "utf-8-validate": "^5.0.2"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.35.1",

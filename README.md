@@ -31,18 +31,20 @@ Bilibili changes, so this installs the current master branch. Set `anniePath` in
 `config.ts` to the resulting Lux binary (usually `~/go/bin/lux`). The config key
 keeps its old name for compatibility.
 
-Next, clone the directory and run
+Next, install Node.js 22.12 or newer. With NVM, run:
 
 ```bash
-$ npm install -g typescript
+$ nvm install
+$ nvm use
 ```
 
-After installing typescript, copy `config.example.ts` to `config.ts` and fill out configs accordingly.
+Copy `config.example.ts` to `config.ts` and fill out the configuration.
 
 Finally, run
 
 ```bash
-$ npm install && npm run start
+$ npm ci --omit=optional
+$ npm run start
 ```
 
 and you're ready to go.

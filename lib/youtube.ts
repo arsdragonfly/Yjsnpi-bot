@@ -1,5 +1,5 @@
 import * as Future from 'fluture'
-import { google } from 'googleapis'
+import * as request from 'superagent'
 import * as libAudio from './audio'
 import { generatePath } from './path'
 import { downloadThumbnail } from './thumbnail'
@@ -16,18 +16,22 @@ export interface YoutubeMetadata {
 }
 
 const downloadMetadata = (videoId: string) => Future.attemptP<string, YoutubeMetadata>(() => {
-  const youtube = google.youtube({ version: 'v3', auth: config.youtubeAPIKey })
-  const promise = youtube.videos.list({ part: ['snippet'], id: [videoId] }).then(res => {
-    if (res.data.items) {
-      return {
-        title: res.data.items[0].snippet?.title || '',
-        thumbnailUrl: res.data.items[0].snippet?.thumbnails?.default?.url || '',
-        desc: res.data.items[0].snippet?.description || ''
+  const promise = request
+    .get('https://www.googleapis.com/youtube/v3/videos')
+    .query({ part: 'snippet', id: videoId, key: config.youtubeAPIKey })
+    .then(res => {
+      const snippet = res.body.items?.[0]?.snippet
+      if (snippet == null) {
+        return Promise.reject('Failed to retrieve metadata.')
       }
-    } else {
+      return {
+        title: snippet.title || '',
+        thumbnailUrl: snippet.thumbnails?.default?.url || '',
+        desc: snippet.description || ''
+      }
+    }, () => {
       return Promise.reject('failed to retrieve metadata.')
-    }
-  }, () => Promise.reject('Failed to retrieve metadata.'))
+    })
   return promise
 })
 
