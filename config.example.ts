@@ -17,7 +17,7 @@ const config: Config = {
   youtubeAPIKey: 'Replace this with an API key obtained here: https://console.developers.google.com/apis/dashboard',
   invite: 'https://discord.gg/DW4Trr2',
   prefix: '()',
-  anniePath: '~/go/bin/annie',
+  anniePath: '~/go/bin/lux',
   voiceConnectionTimeout: 300000
 }
 

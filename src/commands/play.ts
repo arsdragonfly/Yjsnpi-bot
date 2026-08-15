@@ -113,18 +113,18 @@ export class PlayCommand extends Command {
 
     switch (queue.status().tag) {
       case 'playing':
-        interaction.reply('Already playing.').catch()
+        sendMessage('Already playing.').catch()
         break
       case 'stopped':
-        interaction.reply(`Add some music to the queue first with /yjadd`).catch()
+        sendMessage('Add some music to the queue first with /yjadd').catch()
         break
       case 'ready':
-        Future.fork<string>(interaction.reply.bind(interaction))(
+        Future.fork<{}>(sendErrorMessage)(
           (voiceConnection: VoiceConnection) => playQueue(queue, voiceConnection)
         )(joinChannel)
         break
       case 'paused':
-        // interaction.reply(`Use ${config.prefix}resume to resume playing.`).catch()
+        sendMessage('The queue is paused.').catch()
         break
     }
     return null

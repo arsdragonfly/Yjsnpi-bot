@@ -20,13 +20,16 @@ Then, install FFMpeg:
 $ apt install ffmpeg
 ```
 
-Then, install Annie for Bilibili/YouTube access using 
+Then, install Go 1.24 or newer and Lux for Bilibili/YouTube access:
 
 ```bash
-$ go get github.com/iawia002/annie
+$ go install github.com/iawia002/lux@master
 ```
 
-or install Annie from here (remember to change config.ts accordingly): <https://github.com/iawia002/annie>
+Lux is the maintained successor to Annie. Tagged Lux releases can lag behind
+Bilibili changes, so this installs the current master branch. Set `anniePath` in
+`config.ts` to the resulting Lux binary (usually `~/go/bin/lux`). The config key
+keeps its old name for compatibility.
 
 Next, clone the directory and run
 

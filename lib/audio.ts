@@ -4,6 +4,7 @@ import * as Future from 'fluture'
 import config from '../config'
 import { spawn } from 'promisify-child-process'
 import * as path from 'path'
+import * as os from 'os'
 import glob from 'glob-promise'
 
 interface Events {
@@ -157,7 +158,11 @@ const findFile = (path: string) => () => glob(`${path}.*`).then((arr: string[]) 
   arr.shift()
 ))
 
-// downloading audio via annie which will probably work for every platform
+const resolveExecutablePath = (executablePath: string) => executablePath.startsWith('~/')
+  ? path.join(os.homedir(), executablePath.slice(2))
+  : executablePath
+
+// Downloading media via Lux, the successor to Annie.
 export const downloadAudio = (audio: Audio) => Future.fork<string>(() => audio.eventEmitter().emit('fail'))((fullPath: string) => audio.eventEmitter().emit('success', fullPath))(
   Future.attemptP(() => {
     const status = audio.status()
@@ -165,10 +170,10 @@ export const downloadAudio = (audio: Audio) => Future.fork<string>(() => audio.e
       case 'pending':
         const { pendingPath } = status
         return spawn(
-          config.anniePath,
+          resolveExecutablePath(config.anniePath),
           ['-m', '-o', path.dirname(pendingPath), '-O', path.basename(pendingPath), status.url],
-          { stdio: 'inherit', shell: true }
-        ).then(findFile(pendingPath), err => `failed to launch annie because of ${err}`)
+          { stdio: 'inherit' }
+        ).then(findFile(pendingPath))
       default:
         return Promise.reject('Internal error.')
     }
